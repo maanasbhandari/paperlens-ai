@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     apiKeyInput.value = savedKey;
   }
 
-  // Initialize Conversation History (Antigravity Style)
+  // Initialize Conversation History System
   initHistory();
 
   // Start on clean Home Page (Left Sidebar Navigation)
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
- * Antigravity-Style Previous Conversations History System
+ * Previous Conversations History System
  */
 function initHistory() {
   const stored = localStorage.getItem('paperlens_chat_history');
@@ -350,7 +350,7 @@ function navigateTo(viewId) {
 }
 
 /**
- * Start New Conversation / Fresh Front Page (ChatGPT & Antigravity Style)
+ * Start New Conversation / Fresh Front Page (Clean Slate Mode)
  * Resets file uploads, textareas, prompt inputs, and active study indicators.
  */
 function startNewConversation() {
@@ -964,7 +964,7 @@ async function runClinicalSynthesis() {
     const script = window.paperLensEngine.generateAudioBriefingScript(result);
     document.getElementById('audioScriptText').textContent = `"${script}"`;
 
-    // Save session to Previous Conversations history (Antigravity Style)
+    // Save session to Previous Conversations history
     addSessionToHistory(newPaper);
 
     // Navigate to summary on left sidebar

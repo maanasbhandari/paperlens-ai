@@ -1,6 +1,6 @@
 /*
  * PaperLensAI - Left Sidebar Multi-Page Monochrome Design System (Black & White)
- * Inspired by Antigravity, Linear & Vercel
+ * Modern Minimalist Clinical Workspace
  * Typography: Plus Jakarta Sans + JetBrains Mono
  */
 
@@ -49,7 +49,7 @@ body {
   color: #09090b !important;
 }
 
-/* History Conversation Items (Antigravity Style) */
+/* History Conversation Items (Sidebar History) */
 .history-item {
   display: flex;
   align-items: center;
