@@ -127,19 +127,19 @@ function renderStructuredSummary(summary) {
 
   summary.keyFindings.forEach((finding, idx) => {
     const item = document.createElement('div');
-    item.className = 'p-3 rounded-lg border border-slate-100 bg-slate-50 hover:bg-blue-50/40 transition flex items-start justify-between gap-3';
+    item.className = 'p-3 rounded-xl border border-[#e1eae4] bg-[#f9fbf9] hover:bg-[#eaf3ed] transition flex items-start justify-between gap-3';
     item.innerHTML = `
-      <div class="text-xs text-slate-800 leading-relaxed flex-1">
-        <span class="font-bold text-slate-900">${idx + 1}.</span> ${finding.claim}
+      <div class="text-xs text-[#192e24] leading-relaxed flex-1">
+        <span class="font-bold text-[#143628]">${idx + 1}.</span> ${finding.claim}
         <button onclick="inspectSentence(${finding.sentenceIndex})" class="citation-badge" title="Inspect source in Evidence Grounding">
           [Ref ${idx + 1}]
         </button>
       </div>
       <div class="text-right shrink-0">
-        <span class="inline-block px-2.5 py-0.5 rounded text-[10px] font-bold bg-white border border-slate-200 text-blue-800 shadow-2xs">
+        <span class="inline-block px-2.5 py-0.5 rounded text-[10px] font-bold bg-white border border-[#c2d8c9] text-[#143628] shadow-2xs">
           ${finding.metric}
         </span>
-        <div class="text-[10px] font-semibold text-slate-400 mt-0.5">${finding.pVal || ''}</div>
+        <div class="text-[10px] font-semibold text-[#5e7368] mt-0.5">${finding.pVal || ''}</div>
       </div>
     `;
     listEl.appendChild(item);
@@ -155,16 +155,16 @@ function renderEvidenceGrounding(summary, sentences) {
 
   summary.keyFindings.forEach((finding, idx) => {
     const card = document.createElement('div');
-    card.className = 'p-3 rounded-lg border border-slate-200 bg-white hover:border-blue-500 cursor-pointer transition text-xs space-y-1 claim-card';
+    card.className = 'p-3 rounded-xl border border-[#d8e2dc] bg-white hover:border-[#25855a] cursor-pointer transition text-xs space-y-1 claim-card';
     card.id = `claim-card-${idx}`;
     card.onclick = () => highlightSourceSentence(finding.sentenceIndex, idx);
     card.innerHTML = `
       <div class="flex items-center justify-between text-[10px]">
-        <span class="font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">Claim #${idx + 1}</span>
-        <span class="text-slate-400 font-mono">Sentence [${finding.sentenceIndex}]</span>
+        <span class="font-bold text-[#143628] bg-[#eaf3ed] px-2 py-0.5 rounded border border-[#c2d8c9]">Claim #${idx + 1}</span>
+        <span class="text-[#5e7368] font-mono">Sentence [${finding.sentenceIndex}]</span>
       </div>
-      <p class="text-slate-800 font-medium leading-relaxed">${finding.claim}</p>
-      <div class="text-[11px] font-bold text-blue-800 pt-1">${finding.metric} • ${finding.pVal}</div>
+      <p class="text-[#192e24] font-medium leading-relaxed">${finding.claim}</p>
+      <div class="text-[11px] font-bold text-[#25855a] pt-1">${finding.metric} • ${finding.pVal}</div>
     `;
     claimsEl.appendChild(card);
   });
@@ -192,11 +192,11 @@ function inspectSentence(sentenceIndex) {
 
 function highlightSourceSentence(sentenceIndex, claimIdx = null) {
   document.querySelectorAll('.source-sentence').forEach(el => el.classList.remove('highlighted'));
-  document.querySelectorAll('.claim-card').forEach(el => el.classList.remove('border-blue-600', 'bg-blue-50/20'));
+  document.querySelectorAll('.claim-card').forEach(el => el.classList.remove('border-[#25855a]', 'bg-[#eaf3ed]/60'));
 
   if (claimIdx !== null) {
     const card = document.getElementById(`claim-card-${claimIdx}`);
-    if (card) card.classList.add('border-blue-600', 'bg-blue-50/20');
+    if (card) card.classList.add('border-[#25855a]', 'bg-[#eaf3ed]/60');
   }
 
   const target = document.getElementById(`source-sentence-${sentenceIndex}`);
@@ -208,7 +208,7 @@ function highlightSourceSentence(sentenceIndex, claimIdx = null) {
 
 function clearInspectorHighlights() {
   document.querySelectorAll('.source-sentence').forEach(el => el.classList.remove('highlighted'));
-  document.querySelectorAll('.claim-card').forEach(el => el.classList.remove('border-blue-600', 'bg-blue-50/20'));
+  document.querySelectorAll('.claim-card').forEach(el => el.classList.remove('border-[#25855a]', 'bg-[#eaf3ed]/60'));
 }
 
 /**
@@ -292,7 +292,7 @@ function renderCharts(metricsData) {
       datasets: [{
         label: 'Efficacy Metric Delta',
         data: metricsData.efficacyScore,
-        backgroundColor: ['#0284c7', '#94a3b8'],
+        backgroundColor: ['#25855a', '#86a896'],
         borderRadius: 6
       }]
     },
@@ -311,7 +311,7 @@ function renderCharts(metricsData) {
       datasets: [{
         label: 'Adverse Event %',
         data: aeData,
-        backgroundColor: ['#e11d48', '#d97706'],
+        backgroundColor: ['#b45309', '#f59e0b'],
         borderRadius: 6
       }]
     },

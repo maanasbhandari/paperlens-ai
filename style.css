@@ -1,45 +1,105 @@
 /*
- * PaperLensAI - ChatGPT / Gemini Inspired Clean UI Design System
- * Clean, distraction-free, modern biopharma blue aesthetic.
+ * PaperLensAI - MedBrief Inspired Organic Clinical Design System
+ * Palette: #f5f8f6 base, Deep Forest Green (#143628 / #1b4d3e), 
+ * Fresh Mint Accent (#25855a / #10b981), Warm Sage Borders (#d8e2dc)
+ * Fonts: Manrope (Headings & Display), DM Sans (Body & UI)
  */
 
 :root {
-  --sidebar-bg: #0b192c;
-  --sidebar-hover: #1e3e62;
-  --brand-blue: #008170;
-  --pharma-navy: #000000;
-  --primary-accent: #0284c7;
-  --primary-hover: #0369a1;
-  --bg-main: #f8fafc;
-  --card-border: #e2e8f0;
+  --med-bg: #f5f8f6;
+  --med-bg-card: #ffffff;
+  --med-forest: #143628;
+  --med-forest-light: #1b4d3e;
+  --med-forest-dark: #0d241b;
+  --med-mint: #25855a;
+  --med-mint-bright: #10b981;
+  --med-mint-soft: #eaf3ed;
+  --med-sage-border: #d8e2dc;
+  --med-sage-hover: #edf4ef;
+  --med-text-dark: #192e24;
+  --med-text-muted: #5e7368;
+  --sidebar-bg: #0f261c;
+  --sidebar-hover: #193e2f;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background-color: #f1f5f9;
-  color: #0f172a;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--med-bg);
+  color: var(--med-text-dark);
   -webkit-font-smoothing: antialiased;
 }
 
-/* Sidebar active item */
-.nav-item.active {
-  background-color: #0284c7;
-  color: #ffffff !important;
-  font-weight: 600;
+h1, h2, h3, h4, h5, .font-heading {
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Status Dot from MedBrief */
+.status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--med-mint-bright);
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+  margin-right: 6px;
+}
+
+/* Sidebar Styling in MedBrief Deep Forest */
+aside {
+  background-color: var(--sidebar-bg);
+  border-color: #17382a;
+}
+
+.nav-item {
+  color: #c4d6cb;
+  transition: all 0.15s ease-in-out;
 }
 
 .nav-item:hover:not(.active) {
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: rgba(255, 255, 255, 0.07);
   color: #ffffff;
 }
 
-/* Interactive Citation Tag */
+.nav-item.active {
+  background-color: var(--med-mint);
+  color: #ffffff !important;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(37, 133, 90, 0.3);
+}
+
+/* Primary Action Buttons */
+.btn-primary-med {
+  background-color: var(--med-forest);
+  color: #ffffff;
+  transition: all 0.15s ease-in-out;
+}
+
+.btn-primary-med:hover {
+  background-color: var(--med-forest-light);
+  transform: translateY(-1px);
+}
+
+/* Secondary Button from MedBrief */
+.btn-secondary-med {
+  background-color: #ffffff;
+  border: 1px solid var(--med-sage-border);
+  color: var(--med-text-dark);
+  transition: all 0.15s ease-in-out;
+}
+
+.btn-secondary-med:hover {
+  background-color: var(--med-sage-hover);
+  border-color: #c2d1c7;
+}
+
+/* Interactive Citation Tag (MedBrief Style) */
 .citation-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: #0284c7;
-  color: #ffffff;
+  background-color: var(--med-mint-soft);
+  color: var(--med-forest);
+  border: 1px solid #c2d8c9;
   border-radius: 4px;
   font-size: 0.72rem;
   font-weight: 700;
@@ -52,7 +112,9 @@ body {
 }
 
 .citation-badge:hover {
-  background-color: #0369a1;
+  background-color: var(--med-forest);
+  color: #ffffff;
+  border-color: var(--med-forest);
   transform: translateY(-1px);
 }
 
@@ -67,23 +129,23 @@ body {
 }
 
 .source-sentence:hover {
-  background-color: #e0f2fe;
+  background-color: #edf5f0;
 }
 
 .source-sentence.highlighted {
-  background-color: #fef08a;
+  background-color: #fef3c7;
   border-left: 4px solid #d97706;
   color: #78350f;
   font-weight: 600;
   box-shadow: 0 2px 8px rgba(217, 119, 6, 0.15);
 }
 
-/* Audio Waveform */
+/* Audio Waveform in MedBrief Mint */
 .wave-bar {
   display: inline-block;
   width: 3.5px;
   height: 14px;
-  background-color: #38bdf8;
+  background-color: var(--med-mint-bright);
   margin: 0 2px;
   border-radius: 3px;
   transition: height 0.15s ease;
@@ -103,6 +165,33 @@ body {
   0% { height: 4px; }
   50% { height: 24px; }
   100% { height: 8px; }
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #edf3ef;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c2d3c8;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ab4a3;
+}
+
+/* Card system */
+.med-card {
+  background-color: #ffffff;
+  border: 1px solid var(--med-sage-border);
+  border-radius: 14px;
+  box-shadow: 0 1px 4px rgba(20, 54, 40, 0.04);
 }
 
 /* Smooth transitions */
