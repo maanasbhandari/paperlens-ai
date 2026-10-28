@@ -1,0 +1,198 @@
+/*
+ * PaperLensAI - Systematic Clinical Research Intelligence Suite
+ * Editorial & Institutional Medical Design System
+ */
+
+:root {
+  --primary-navy: #0f172a;
+  --secondary-navy: #1e293b;
+  --slate-header: #334155;
+  --accent-teal: #0d9488;
+  --accent-blue: #0284c7;
+  --clinical-emerald: #059669;
+  --clinical-amber: #d97706;
+  --clinical-rose: #e11d48;
+  --bg-slate: #f8fafc;
+  --card-border: #e2e8f0;
+  --card-border-focus: #94a3b8;
+  --text-dark: #0f172a;
+  --text-muted: #64748b;
+  --citation-highlight-bg: #fef08a;
+  --citation-highlight-border: #ca8a04;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--bg-slate);
+  color: var(--text-dark);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Editorial Serif for Clinical Headings */
+.font-clinical-serif {
+  font-family: "Georgia", "Cambria", "Times New Roman", serif;
+}
+
+/* Institutional Navigation Bar */
+.gov-banner {
+  background: #0b132b;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+}
+
+/* Interactive Citation Tag */
+.citation-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  margin: 0 3px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  text-decoration: none;
+  vertical-align: super;
+}
+
+.citation-badge:hover {
+  background-color: #0284c7;
+  color: #ffffff;
+  border-color: #0284c7;
+  transform: translateY(-1px);
+}
+
+.citation-badge.active {
+  background-color: #0284c7;
+  color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.4);
+}
+
+/* Source Sentence Highlighting in Inspector */
+.source-sentence {
+  padding: 4px 6px;
+  margin-bottom: 4px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  line-height: 1.6;
+  border-left: 3px solid transparent;
+}
+
+.source-sentence:hover {
+  background-color: #f1f5f9;
+}
+
+.source-sentence.highlighted {
+  background-color: #fef3c7;
+  border-left: 3px solid #d97706;
+  color: #92400e;
+  font-weight: 500;
+  box-shadow: 0 1px 4px rgba(217, 119, 6, 0.15);
+}
+
+/* Audio Waveform Animation */
+.wave-bar {
+  display: inline-block;
+  width: 3px;
+  height: 14px;
+  background-color: #0284c7;
+  margin: 0 1.5px;
+  border-radius: 3px;
+  transition: height 0.15s ease;
+}
+
+.wave-bar.playing {
+  animation: pulse-wave 1.1s ease-in-out infinite alternate;
+}
+
+.wave-bar:nth-child(2) { animation-delay: 0.1s; }
+.wave-bar:nth-child(3) { animation-delay: 0.25s; }
+.wave-bar:nth-child(4) { animation-delay: 0.4s; }
+.wave-bar:nth-child(5) { animation-delay: 0.15s; }
+.wave-bar:nth-child(6) { animation-delay: 0.35s; }
+.wave-bar:nth-child(7) { animation-delay: 0.05s; }
+.wave-bar:nth-child(8) { animation-delay: 0.3s; }
+
+@keyframes pulse-wave {
+  0% { height: 4px; }
+  50% { height: 22px; }
+  100% { height: 8px; }
+}
+
+/* Clean Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Systematic Review Table */
+.matrix-table th {
+  background-color: #f8fafc;
+  color: #475569;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.matrix-table td {
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: top;
+}
+
+/* Clinical Badge styles */
+.badge-gold {
+  background-color: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.badge-emerald {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.badge-rose {
+  background-color: #fff1f2;
+  color: #9f1239;
+  border: 1px solid #fecdd3;
+}
+
+.badge-blue {
+  background-color: #eff6ff;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+}
+
+/* Print styling for clinical reports */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background-color: white !important;
+    color: black !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+}
