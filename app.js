@@ -1,21 +1,18 @@
 /**
- * PaperLensAI - Application Controller (ChatGPT / Gemini Style Multi-Page Webapp)
+ * PaperLensAI - Screen 1 (Intake) to Screen 2 (Results & Multi-Option Navigation)
  */
 
 const appState = {
-  currentView: 'home',
+  activeScreen: 'intake', // 'intake' | 'results'
+  activeResultOption: 'summary', // 'summary' | 'grounding' | 'matrix' | 'charts' | 'audio'
   currentPaper: null,
   activeSentences: [],
   selectedFile: null,
   inputMode: 'upload', // 'upload' | 'paste'
-  selectedAngle: '',
   audio: {
     isPlaying: false,
     utterance: null,
-    speechRate: 1.0,
-    progressInterval: null,
-    elapsedSeconds: 0,
-    totalSeconds: 32
+    speechRate: 1.0
   },
   charts: {
     efficacyChart: null,
@@ -33,50 +30,59 @@ document.addEventListener('DOMContentLoaded', () => {
     apiKeyInput.value = savedKey;
   }
 
-  // Start on clean Home Page (ChatGPT / Gemini style)
-  navigateTo('home');
+  // Ensure initial state is clean Screen 1 ONLY
+  resetToIntakeScreen();
 });
 
 /**
- * Multi-Page Navigation Router
+ * Screen 1 -> Screen 2 Transitions
  */
-function navigateTo(viewId) {
-  appState.currentView = viewId;
+function showResultsScreen() {
+  appState.activeScreen = 'results';
+  document.getElementById('screen-intake').classList.add('hidden');
+  document.getElementById('screen-results').classList.remove('hidden');
 
-  // Hide all page views
-  document.querySelectorAll('.page-view').forEach(el => el.classList.add('hidden'));
+  // Default to summary option on results screen
+  switchResultOption('summary');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-  // Show target page view
-  const targetPage = document.getElementById(`page-${viewId}`);
-  if (targetPage) targetPage.classList.remove('hidden');
+function resetToIntakeScreen() {
+  appState.activeScreen = 'intake';
+  document.getElementById('screen-results').classList.add('hidden');
+  document.getElementById('screen-intake').classList.remove('hidden');
 
-  // Update Sidebar active state
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  const activeNav = document.getElementById(`nav-${viewId}`);
-  if (activeNav) activeNav.classList.add('active');
+  // Stop any ongoing audio
+  stopAudioBriefing();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-  // Update Header Title
-  const titles = {
-    home: 'New Clinical Analysis',
-    summary: 'Structured Clinical Summary',
-    grounding: 'Evidence Grounding & Source Inspector',
-    matrix: 'Cross-Trial Contradiction & Consensus Matrix',
-    charts: 'Quantitative Endpoint Charts',
-    audio: 'Clinical Audio Briefing ("Podcast Mode")'
-  };
-  const titleEl = document.getElementById('currentViewTitle');
-  if (titleEl) titleEl.textContent = titles[viewId] || 'PaperLensAI';
+/**
+ * Screen 2 Option Navigation Switcher
+ */
+function switchResultOption(optionId) {
+  appState.activeResultOption = optionId;
 
-  // Resize charts if opening charts page
-  if (viewId === 'charts' && appState.currentPaper) {
-    setTimeout(() => renderCharts(appState.currentPaper.metricsData), 100);
+  // Update Buttons
+  document.querySelectorAll('.option-tab-btn').forEach(btn => btn.classList.remove('active'));
+  const activeBtn = document.getElementById(`opt-${optionId}`);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  // Update Result Views
+  document.querySelectorAll('.result-view').forEach(view => view.classList.add('hidden'));
+  const activeView = document.getElementById(`view-${optionId}`);
+  if (activeView) activeView.classList.remove('hidden');
+
+  // Resize charts if opening charts view
+  if (optionId === 'charts' && appState.currentPaper) {
+    setTimeout(() => renderCharts(appState.currentPaper.metricsData), 80);
   }
 
   if (window.lucide) window.lucide.createIcons();
 }
 
 /**
- * Load Landmark Sample Paper & Navigate to Summary
+ * Load Landmark Sample Paper (1-Click Evaluation)
  */
 function loadSamplePaper(paperId) {
   const paper = SAMPLE_PAPERS.find(p => p.id === paperId);
@@ -85,32 +91,26 @@ function loadSamplePaper(paperId) {
   appState.currentPaper = paper;
   appState.activeSentences = paper.sentences;
 
-  // Update Header Badge
-  const badge = document.getElementById('activeStudyBadge');
-  if (badge) {
-    badge.textContent = `Active: ${paper.title.substring(0, 35)}...`;
-    badge.classList.remove('hidden');
-  }
+  // Populate Screen 2 Top Bar
+  document.getElementById('resTitleHeading').textContent = paper.title;
+  document.getElementById('resAuthorsP').textContent = `${paper.authors} | DOI: ${paper.doi} | PMID: ${paper.pmid}`;
+  document.getElementById('resPhaseBadge').textContent = paper.phase;
+  document.getElementById('resJournalBadge').textContent = `${paper.journal} ${paper.year}`;
+  document.getElementById('resSampleBadge').textContent = `N = ${paper.sampleSize.toLocaleString()} Enrolled`;
+  document.getElementById('resGroundingScore').textContent = paper.structuredSummary.groundingFidelity;
 
-  // Populate Structured Summary
-  document.getElementById('studyTitleHeading').textContent = paper.title;
-  document.getElementById('studyAuthorsP').textContent = `${paper.authors} | DOI: ${paper.doi}`;
-  document.getElementById('summaryPhaseBadge').textContent = paper.phase;
-  document.getElementById('summaryJournalBadge').textContent = `${paper.journal} ${paper.year}`;
-  document.getElementById('summarySampleBadge').textContent = `N = ${paper.sampleSize.toLocaleString()}`;
-  document.getElementById('groundingScoreValue').textContent = paper.structuredSummary.groundingFidelity;
-
+  // Render Sub-Views
   renderStructuredSummary(paper.structuredSummary);
   renderEvidenceGrounding(paper.structuredSummary, paper.sentences);
-  renderCharts(paper.metricsData);
   renderComparisonMatrix();
+  renderCharts(paper.metricsData);
 
   // Audio script
   const script = window.paperLensEngine.generateAudioBriefingScript(paper.structuredSummary);
   document.getElementById('audioScriptText').textContent = `"${script}"`;
 
-  // Navigate to summary page
-  navigateTo('summary');
+  // Transition to Screen 2
+  showResultsScreen();
 }
 
 /**
@@ -186,7 +186,7 @@ function renderEvidenceGrounding(summary, sentences) {
 }
 
 function inspectSentence(sentenceIndex) {
-  navigateTo('grounding');
+  switchResultOption('grounding');
   highlightSourceSentence(sentenceIndex);
 }
 
@@ -221,7 +221,7 @@ function renderComparisonMatrix() {
   chipsEl.innerHTML = '';
   matrix.studiesCompared.forEach(t => {
     const chip = document.createElement('span');
-    chip.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200';
+    chip.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-[#eaf3ed] text-[#143628] border border-[#c2d8c9]';
     chip.textContent = t;
     chipsEl.appendChild(chip);
   });
@@ -232,13 +232,13 @@ function renderComparisonMatrix() {
     const div = document.createElement('div');
     div.className = 'pt-3 pb-2 first:pt-0 text-xs';
     div.innerHTML = `
-      <div class="flex items-center justify-between font-bold text-slate-900 mb-1">
+      <div class="flex items-center justify-between font-bold text-[#143628] mb-1">
         <span>${idx + 1}. ${pt.topic}</span>
-        <span class="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">${pt.confidence}</span>
+        <span class="text-[10px] text-[#143628] bg-white px-2 py-0.5 rounded border border-[#c2d8c9]">${pt.confidence}</span>
       </div>
-      <p class="text-slate-600 mb-2 leading-relaxed">${pt.finding}</p>
-      <div class="bg-slate-50 p-2 rounded text-[11px] text-slate-500 font-mono">
-        <strong class="text-slate-700">Evidence:</strong> "${pt.groundingSnippet}"
+      <p class="text-[#5e7368] mb-2 leading-relaxed">${pt.finding}</p>
+      <div class="bg-[#f9fbf9] p-2.5 rounded-lg border border-[#e1eae4] text-[11px] font-mono">
+        <strong class="text-[#143628]">Evidence:</strong> "${pt.groundingSnippet}"
       </div>
     `;
     consensusEl.appendChild(div);
@@ -250,20 +250,20 @@ function renderComparisonMatrix() {
     const div = document.createElement('div');
     div.className = 'pt-3 pb-2 first:pt-0 text-xs';
     div.innerHTML = `
-      <div class="flex items-center justify-between font-bold text-slate-900 mb-1">
+      <div class="flex items-center justify-between font-bold text-[#9f1239] mb-1">
         <span>${idx + 1}. ${ct.topic}</span>
-        <span class="text-[10px] text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">${ct.status}</span>
+        <span class="text-[10px] text-[#9f1239] bg-white px-2 py-0.5 rounded border border-[#fecdd3]">${ct.status}</span>
       </div>
-      <p class="text-slate-600 mb-2 leading-relaxed">${ct.finding}</p>
+      <p class="text-[#5e7368] mb-2 leading-relaxed">${ct.finding}</p>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px] mb-2">
-        <div class="bg-slate-50 p-2 rounded border border-slate-100">
-          <strong class="block text-slate-800">Study A:</strong> ${ct.evidenceA}
+        <div class="bg-white p-2.5 rounded-lg border border-[#fecdd3]">
+          <strong class="block text-[#143628]">Study A:</strong> ${ct.evidenceA}
         </div>
-        <div class="bg-slate-50 p-2 rounded border border-slate-100">
-          <strong class="block text-slate-800">Study B:</strong> ${ct.evidenceB}
+        <div class="bg-white p-2.5 rounded-lg border border-[#fecdd3]">
+          <strong class="block text-[#143628]">Study B:</strong> ${ct.evidenceB}
         </div>
       </div>
-      <div class="text-[11px] text-amber-900 bg-amber-50 p-2 rounded border border-amber-200">
+      <div class="text-[11px] text-[#78350f] bg-[#fffdfa] p-2.5 rounded-lg border border-[#fde68a]">
         <strong>Clinical Impact:</strong> ${ct.clinicalImpact}
       </div>
     `;
@@ -385,15 +385,14 @@ function setPlaybackSpeed(speed) {
   [1.0, 1.25, 1.5].forEach(s => {
     const btn = document.getElementById(`speedBtn${s === 1.0 ? '1' : s === 1.25 ? '125' : '15'}`);
     if (btn) {
-      if (s === speed) btn.className = 'px-2.5 py-0.5 rounded font-bold bg-blue-600 text-white';
-      else btn.className = 'px-2.5 py-0.5 rounded text-slate-400 hover:text-white';
+      if (s === speed) btn.className = 'px-2.5 py-0.5 rounded font-bold bg-[#25855a] text-white';
+      else btn.className = 'px-2.5 py-0.5 rounded text-[#86a896] hover:text-white';
     }
   });
   if (appState.audio.isPlaying) startAudioBriefing();
 }
 
 function skipAudio(sec) {
-  // Restart or proceed
   if (appState.audio.isPlaying) startAudioBriefing();
 }
 
@@ -404,19 +403,19 @@ function switchInputMode(mode) {
   appState.inputMode = mode;
   const dropZone = document.getElementById('dropZoneArea');
   const pasteArea = document.getElementById('pasteArea');
-  const uploadBtn = document.getElementById('homeTabUploadBtn');
-  const pasteBtn = document.getElementById('homeTabPasteBtn');
+  const uploadBtn = document.getElementById('tabUploadBtn');
+  const pasteBtn = document.getElementById('tabPasteBtn');
 
   if (mode === 'upload') {
     dropZone.classList.remove('hidden');
     pasteArea.classList.add('hidden');
-    uploadBtn.className = 'text-xs font-bold text-blue-600 border-b-2 border-blue-600 pb-1 flex items-center';
-    pasteBtn.className = 'text-xs font-semibold text-slate-400 hover:text-slate-700 pb-1 flex items-center';
+    uploadBtn.className = 'font-bold text-[#143628] border-b-2 border-[#143628] pb-1 flex items-center';
+    pasteBtn.className = 'font-medium text-[#5e7368] hover:text-[#143628] pb-1 flex items-center';
   } else {
     dropZone.classList.add('hidden');
     pasteArea.classList.remove('hidden');
-    pasteBtn.className = 'text-xs font-bold text-blue-600 border-b-2 border-blue-600 pb-1 flex items-center';
-    uploadBtn.className = 'text-xs font-semibold text-slate-400 hover:text-slate-700 pb-1 flex items-center';
+    pasteBtn.className = 'font-bold text-[#143628] border-b-2 border-[#143628] pb-1 flex items-center';
+    uploadBtn.className = 'font-medium text-[#5e7368] hover:text-[#143628] pb-1 flex items-center';
   }
 }
 
@@ -435,23 +434,17 @@ function clearSelectedFile(event) {
   document.getElementById('selectedFileInfo').classList.add('hidden');
 }
 
-function setClinicalAngle(angle) {
-  appState.selectedAngle = angle;
-  document.getElementById('customAngleInput').value = angle;
-}
-
 /**
- * Execute Clinical Synthesis
+ * Run Clinical Synthesis -> Transitions immediately to Screen 2!
  */
 async function runClinicalSynthesis() {
   const customQuery = document.getElementById('customAngleInput').value.trim();
   let textToAnalyze = '';
   let paperTitle = 'Uploaded Clinical Paper';
 
-  const btn = document.querySelector('button[onclick="runClinicalSynthesis()"]');
-  const originalHtml = btn.innerHTML;
-  btn.innerHTML = `<span class="animate-spin mr-2">⚙️</span> Synthesizing Evidence...`;
-  btn.disabled = true;
+  const btnText = document.getElementById('submitBtnText');
+  const originalText = btnText.textContent;
+  btnText.textContent = "Synthesizing Evidence...";
 
   try {
     if (appState.inputMode === 'upload' && appState.selectedFile) {
@@ -464,13 +457,15 @@ async function runClinicalSynthesis() {
     }
 
     if (!textToAnalyze) {
-      alert("Please upload a PDF/text file or paste text first, or click one of the sample trials below!");
+      alert("Please upload a PDF/text file or paste an abstract, or click one of the sample trials!");
+      btnText.textContent = originalText;
       return;
     }
 
+    // Call Engine
     const result = await window.paperLensEngine.analyzePaper(textToAnalyze, {
       title: paperTitle,
-      clinicalAngle: appState.selectedAngle,
+      clinicalAngle: customQuery,
       customPrompt: customQuery
     });
 
@@ -493,43 +488,36 @@ async function runClinicalSynthesis() {
     appState.currentPaper = newPaper;
     appState.activeSentences = result.sentences;
 
-    // Update active badge in top bar
-    const badge = document.getElementById('activeStudyBadge');
-    if (badge) {
-      badge.textContent = `Active: ${paperTitle.substring(0, 30)}...`;
-      badge.classList.remove('hidden');
-    }
+    // Populate Screen 2 Top Bar
+    document.getElementById('resTitleHeading').textContent = newPaper.title;
+    document.getElementById('resAuthorsP').textContent = `Clinical Ingestion Pipeline | ${newPaper.sentences.length} sentences extracted`;
+    document.getElementById('resPhaseBadge').textContent = newPaper.phase;
+    document.getElementById('resJournalBadge').textContent = newPaper.journal;
+    document.getElementById('resSampleBadge').textContent = `N = ${newPaper.sampleSize}`;
+    document.getElementById('resGroundingScore').textContent = result.groundingFidelity;
 
-    // Populate and switch to summary view
-    document.getElementById('studyTitleHeading').textContent = newPaper.title;
-    document.getElementById('studyAuthorsP').textContent = `${newPaper.authors} | ${newPaper.sentences.length} sentences extracted`;
-    document.getElementById('summaryPhaseBadge').textContent = newPaper.phase;
-    document.getElementById('summaryJournalBadge').textContent = newPaper.journal;
-    document.getElementById('summarySampleBadge').textContent = `N = ${newPaper.sampleSize}`;
-    document.getElementById('groundingScoreValue').textContent = result.groundingFidelity;
-
+    // Render Sub-Views
     renderStructuredSummary(result);
     renderEvidenceGrounding(result, result.sentences);
-    renderCharts(result.metricsData);
     renderComparisonMatrix();
+    renderCharts(result.metricsData);
 
     const script = window.paperLensEngine.generateAudioBriefingScript(result);
     document.getElementById('audioScriptText').textContent = `"${script}"`;
 
-    // Navigate to summary
-    navigateTo('summary');
+    // Transition immediately to Screen 2
+    showResultsScreen();
 
   } catch (err) {
     console.error("Synthesis error:", err);
     alert("Error: " + err.message);
   } finally {
-    btn.innerHTML = originalHtml;
-    btn.disabled = false;
+    btnText.textContent = originalText;
   }
 }
 
 /**
- * Settings & Printing
+ * Settings Modal
  */
 function openSettingsModal() {
   document.getElementById('settingsModal').classList.remove('hidden');
@@ -544,8 +532,4 @@ function saveApiKeySettings() {
   window.paperLensEngine.setApiKey(key);
   closeSettingsModal();
   alert("Settings saved! Free Gemini API is active.");
-}
-
-function exportClinicalReport() {
-  window.print();
 }

@@ -1,16 +1,15 @@
 /*
- * PaperLensAI - MedBrief Inspired Organic Clinical Design System
- * Palette: #f5f8f6 base, Deep Forest Green (#143628 / #1b4d3e), 
- * Fresh Mint Accent (#25855a / #10b981), Warm Sage Borders (#d8e2dc)
- * Fonts: Manrope (Headings & Display), DM Sans (Body & UI)
+ * PaperLensAI - MedBrief Minimalist Architecture
+ * Screen 1: Clean, focused Intake (File + Prompt ONLY)
+ * Screen 2: Interactive Exploration Hub with Multiple Result Options
  */
 
 :root {
   --med-bg: #f5f8f6;
-  --med-bg-card: #ffffff;
+  --med-card-bg: #ffffff;
   --med-forest: #143628;
   --med-forest-light: #1b4d3e;
-  --med-forest-dark: #0d241b;
+  --med-forest-dark: #0a1f16;
   --med-mint: #25855a;
   --med-mint-bright: #10b981;
   --med-mint-soft: #eaf3ed;
@@ -18,8 +17,6 @@
   --med-sage-hover: #edf4ef;
   --med-text-dark: #192e24;
   --med-text-muted: #5e7368;
-  --sidebar-bg: #0f261c;
-  --sidebar-hover: #193e2f;
 }
 
 body {
@@ -27,13 +24,14 @@ body {
   background-color: var(--med-bg);
   color: var(--med-text-dark);
   -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
 }
 
 h1, h2, h3, h4, h5, .font-heading {
   font-family: 'Manrope', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-/* Status Dot from MedBrief */
+/* Status Dot */
 .status-dot {
   display: inline-block;
   width: 7px;
@@ -44,30 +42,15 @@ h1, h2, h3, h4, h5, .font-heading {
   margin-right: 6px;
 }
 
-/* Sidebar Styling in MedBrief Deep Forest */
-aside {
-  background-color: var(--sidebar-bg);
-  border-color: #17382a;
+/* MedBrief Card System */
+.med-card {
+  background-color: #ffffff;
+  border: 1px solid var(--med-sage-border);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px -2px rgba(20, 54, 40, 0.05);
 }
 
-.nav-item {
-  color: #c4d6cb;
-  transition: all 0.15s ease-in-out;
-}
-
-.nav-item:hover:not(.active) {
-  background-color: rgba(255, 255, 255, 0.07);
-  color: #ffffff;
-}
-
-.nav-item.active {
-  background-color: var(--med-mint);
-  color: #ffffff !important;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(37, 133, 90, 0.3);
-}
-
-/* Primary Action Buttons */
+/* Buttons */
 .btn-primary-med {
   background-color: var(--med-forest);
   color: #ffffff;
@@ -79,7 +62,6 @@ aside {
   transform: translateY(-1px);
 }
 
-/* Secondary Button from MedBrief */
 .btn-secondary-med {
   background-color: #ffffff;
   border: 1px solid var(--med-sage-border);
@@ -92,7 +74,40 @@ aside {
   border-color: #c2d1c7;
 }
 
-/* Interactive Citation Tag (MedBrief Style) */
+/* Option Cards (Screen 2 Multi-Option Navigation) */
+.option-tab-btn {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: 1px solid var(--med-sage-border);
+  background-color: #ffffff;
+  color: var(--med-text-muted);
+  transition: all 0.15s ease-in-out;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.option-tab-btn:hover {
+  background-color: var(--med-sage-hover);
+  color: var(--med-forest);
+  border-color: #c2d8c9;
+}
+
+.option-tab-btn.active {
+  background-color: var(--med-forest);
+  color: #ffffff !important;
+  border-color: var(--med-forest);
+  box-shadow: 0 4px 12px rgba(20, 54, 40, 0.15);
+}
+
+.option-tab-btn.active i {
+  color: #a7f3d0 !important;
+}
+
+/* Interactive Citation Tag */
 .citation-badge {
   display: inline-flex;
   align-items: center;
@@ -118,7 +133,7 @@ aside {
   transform: translateY(-1px);
 }
 
-/* Source Sentence Highlighting */
+/* Source Sentence Highlighting in Inspector */
 .source-sentence {
   padding: 8px 12px;
   margin-bottom: 6px;
@@ -140,7 +155,7 @@ aside {
   box-shadow: 0 2px 8px rgba(217, 119, 6, 0.15);
 }
 
-/* Audio Waveform in MedBrief Mint */
+/* Audio Waveform */
 .wave-bar {
   display: inline-block;
   width: 3.5px;
@@ -186,20 +201,12 @@ aside {
   background: #9ab4a3;
 }
 
-/* Card system */
-.med-card {
-  background-color: #ffffff;
-  border: 1px solid var(--med-sage-border);
-  border-radius: 14px;
-  box-shadow: 0 1px 4px rgba(20, 54, 40, 0.04);
-}
-
-/* Smooth transitions */
+/* Animations */
 .fade-in {
-  animation: fadeIn 0.2s ease-in-out;
+  animation: fadeIn 0.25s ease-in-out;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
