@@ -106,8 +106,8 @@ flowchart TD
 
 | Team Member | Role | Core Responsibilities & Contributions |
 | :--- | :--- | :--- |
-| **Maanas Bhandari** | **Team Lead & Full-Stack Architect** | System architecture, Vercel serverless integration, core engine controller, and intake routing. |
-| **Mayank Kumar** | **Clinical NLP & Prompt Engineering** | Google Gemini prompt design, sentence-level citation indexing, and Cochrane risk-of-bias validation rules. |
+| **[Maanas Bhandari]** | **Team Lead & Full-Stack Architect** | System architecture, Vercel serverless integration, core engine controller, and intake routing. |
+| **[Mayank Kumar]** | **Clinical NLP & Prompt Engineering** | Google Gemini prompt design, sentence-level citation indexing, and Cochrane risk-of-bias validation rules. |
 | **[Sujit Bhaskar Bhat]** | **Frontend & Data Visualization** | Monochrome UI/UX design system, Chart.js quantitative endpoint visualizer, and Web Speech audio player. |
 | **[BODDEPALLI SAI SUDARSHAN]** | **Clinical Data & Benchmark Validation** | NEJM Phase 3 trial dataset curation, multi-paper contradiction/consensus matrix benchmarking, and QA testing. |
 | **Siddharth Vijayaraghavan Rajamani** | **Clinical Data & Benchmark Validation** | NEJM Phase 3 trial dataset curation, multi-paper contradiction/consensus matrix benchmarking, and QA testing. |
