@@ -1,122 +1,131 @@
 /*
- * PaperLensAI - MedBrief Minimalist Architecture
- * Screen 1: Clean, focused Intake (File + Prompt ONLY)
- * Screen 2: Interactive Exploration Hub with Multiple Result Options
+ * PaperLensAI - Ultra-Premium Monochrome Design System (Black & White)
+ * Inspired by Linear, Vercel & Apple Healthtech
+ * Typography: Plus Jakarta Sans + JetBrains Mono
  */
 
 :root {
-  --med-bg: #f5f8f6;
-  --med-card-bg: #ffffff;
-  --med-forest: #143628;
-  --med-forest-light: #1b4d3e;
-  --med-forest-dark: #0a1f16;
-  --med-mint: #25855a;
-  --med-mint-bright: #10b981;
-  --med-mint-soft: #eaf3ed;
-  --med-sage-border: #d8e2dc;
-  --med-sage-hover: #edf4ef;
-  --med-text-dark: #192e24;
-  --med-text-muted: #5e7368;
+  --bg-primary: #fafafa;
+  --bg-card: #ffffff;
+  --text-primary: #09090b;
+  --text-secondary: #52525b;
+  --text-muted: #71717a;
+  --border-subtle: #e4e4e7;
+  --border-strong: #27272a;
+  --black-solid: #09090b;
+  --black-hover: #18181b;
+  --zinc-100: #f4f4f5;
+  --zinc-200: #e4e4e7;
+  --zinc-800: #27272a;
+  --zinc-900: #18181b;
 }
 
 body {
-  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-color: var(--med-bg);
-  color: var(--med-text-dark);
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
 }
 
-h1, h2, h3, h4, h5, .font-heading {
-  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+/* Subtle background grid pattern to prevent emptiness */
+.bg-grid-pattern {
+  background-image: radial-gradient(#d4d4d8 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
-/* Status Dot */
-.status-dot {
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background-color: var(--med-mint-bright);
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
-  margin-right: 6px;
-}
-
-/* MedBrief Card System */
-.med-card {
-  background-color: #ffffff;
-  border: 1px solid var(--med-sage-border);
-  border-radius: 16px;
-  box-shadow: 0 4px 20px -2px rgba(20, 54, 40, 0.05);
-}
-
-/* Buttons */
-.btn-primary-med {
-  background-color: var(--med-forest);
-  color: #ffffff;
-  transition: all 0.15s ease-in-out;
-}
-
-.btn-primary-med:hover {
-  background-color: var(--med-forest-light);
-  transform: translateY(-1px);
-}
-
-.btn-secondary-med {
-  background-color: #ffffff;
-  border: 1px solid var(--med-sage-border);
-  color: var(--med-text-dark);
-  transition: all 0.15s ease-in-out;
-}
-
-.btn-secondary-med:hover {
-  background-color: var(--med-sage-hover);
-  border-color: #c2d1c7;
-}
-
-/* Option Cards (Screen 2 Multi-Option Navigation) */
-.option-tab-btn {
-  display: flex;
+/* Top Announcement Pill */
+.announcement-pill {
+  display: inline-flex;
   align-items: center;
-  padding: 10px 16px;
-  border-radius: 12px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  border: 1px solid var(--med-sage-border);
+  padding: 4px 12px;
   background-color: #ffffff;
-  color: var(--med-text-muted);
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* Cards */
+.mono-card {
+  background-color: #ffffff;
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 10px 25px -5px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease-in-out;
+}
+
+.mono-card:hover {
+  border-color: #d4d4d8;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 20px 30px -10px rgba(0, 0, 0, 0.06);
+}
+
+/* Primary Action Buttons (Solid Black) */
+.btn-primary-mono {
+  background-color: var(--black-solid);
+  color: #ffffff;
+  border: 1px solid var(--black-solid);
+  transition: all 0.15s ease-in-out;
+}
+
+.btn-primary-mono:hover {
+  background-color: var(--black-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Secondary Buttons */
+.btn-secondary-mono {
+  background-color: #ffffff;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  transition: all 0.15s ease-in-out;
+}
+
+.btn-secondary-mono:hover {
+  background-color: #f4f4f5;
+  border-color: #d4d4d8;
+}
+
+/* Option Tabs (Screen 2 Navigation) */
+.option-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid var(--border-subtle);
+  background-color: #ffffff;
+  color: var(--text-secondary);
   transition: all 0.15s ease-in-out;
   cursor: pointer;
   white-space: nowrap;
 }
 
 .option-tab-btn:hover {
-  background-color: var(--med-sage-hover);
-  color: var(--med-forest);
-  border-color: #c2d8c9;
+  background-color: #f4f4f5;
+  color: var(--text-primary);
 }
 
 .option-tab-btn.active {
-  background-color: var(--med-forest);
+  background-color: var(--black-solid);
   color: #ffffff !important;
-  border-color: var(--med-forest);
-  box-shadow: 0 4px 12px rgba(20, 54, 40, 0.15);
+  border-color: var(--black-solid);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.option-tab-btn.active i {
-  color: #a7f3d0 !important;
-}
-
-/* Interactive Citation Tag */
+/* Citation Tag */
 .citation-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--med-mint-soft);
-  color: var(--med-forest);
-  border: 1px solid #c2d8c9;
+  background-color: var(--black-solid);
+  color: #ffffff;
   border-radius: 4px;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
   padding: 1px 6px;
   margin: 0 3px;
@@ -127,9 +136,7 @@ h1, h2, h3, h4, h5, .font-heading {
 }
 
 .citation-badge:hover {
-  background-color: var(--med-forest);
-  color: #ffffff;
-  border-color: var(--med-forest);
+  background-color: #3f3f46;
   transform: translateY(-1px);
 }
 
@@ -144,23 +151,23 @@ h1, h2, h3, h4, h5, .font-heading {
 }
 
 .source-sentence:hover {
-  background-color: #edf5f0;
+  background-color: #f4f4f5;
 }
 
 .source-sentence.highlighted {
-  background-color: #fef3c7;
-  border-left: 4px solid #d97706;
-  color: #78350f;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.15);
+  background-color: #18181b;
+  border-left: 4px solid #000000;
+  color: #ffffff;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* Audio Waveform */
+/* Audio Waveform in Crisp Monochrome */
 .wave-bar {
   display: inline-block;
   width: 3.5px;
   height: 14px;
-  background-color: var(--med-mint-bright);
+  background-color: #ffffff;
   margin: 0 2px;
   border-radius: 3px;
   transition: height 0.15s ease;
@@ -182,28 +189,28 @@ h1, h2, h3, h4, h5, .font-heading {
   100% { height: 8px; }
 }
 
-/* Custom Scrollbars */
+/* Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #edf3ef;
+  background: #f4f4f5;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c2d3c8;
+  background: #d4d4d8;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9ab4a3;
+  background: #a1a1aa;
 }
 
-/* Animations */
+/* Fade in */
 .fade-in {
-  animation: fadeIn 0.25s ease-in-out;
+  animation: fadeIn 0.2s ease-in-out;
 }
 
 @keyframes fadeIn {

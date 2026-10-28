@@ -127,19 +127,19 @@ function renderStructuredSummary(summary) {
 
   summary.keyFindings.forEach((finding, idx) => {
     const item = document.createElement('div');
-    item.className = 'p-3 rounded-xl border border-[#e1eae4] bg-[#f9fbf9] hover:bg-[#eaf3ed] transition flex items-start justify-between gap-3';
+    item.className = 'p-3.5 rounded-xl border border-[#e4e4e7] bg-[#fafafa] hover:bg-[#f4f4f5] transition flex items-start justify-between gap-3';
     item.innerHTML = `
-      <div class="text-xs text-[#192e24] leading-relaxed flex-1">
-        <span class="font-bold text-[#143628]">${idx + 1}.</span> ${finding.claim}
+      <div class="text-xs text-[#09090b] leading-relaxed flex-1 font-medium">
+        <span class="font-bold text-[#09090b]">${idx + 1}.</span> ${finding.claim}
         <button onclick="inspectSentence(${finding.sentenceIndex})" class="citation-badge" title="Inspect source in Evidence Grounding">
           [Ref ${idx + 1}]
         </button>
       </div>
       <div class="text-right shrink-0">
-        <span class="inline-block px-2.5 py-0.5 rounded text-[10px] font-bold bg-white border border-[#c2d8c9] text-[#143628] shadow-2xs">
+        <span class="inline-block px-2.5 py-0.5 rounded text-[10px] font-bold bg-white border border-[#e4e4e7] text-[#09090b] shadow-xs font-mono">
           ${finding.metric}
         </span>
-        <div class="text-[10px] font-semibold text-[#5e7368] mt-0.5">${finding.pVal || ''}</div>
+        <div class="text-[10px] font-semibold text-[#71717a] mt-0.5">${finding.pVal || ''}</div>
       </div>
     `;
     listEl.appendChild(item);
@@ -155,16 +155,16 @@ function renderEvidenceGrounding(summary, sentences) {
 
   summary.keyFindings.forEach((finding, idx) => {
     const card = document.createElement('div');
-    card.className = 'p-3 rounded-xl border border-[#d8e2dc] bg-white hover:border-[#25855a] cursor-pointer transition text-xs space-y-1 claim-card';
+    card.className = 'p-3.5 rounded-xl border border-[#e4e4e7] bg-white hover:border-[#09090b] cursor-pointer transition text-xs space-y-1.5 claim-card shadow-xs';
     card.id = `claim-card-${idx}`;
     card.onclick = () => highlightSourceSentence(finding.sentenceIndex, idx);
     card.innerHTML = `
       <div class="flex items-center justify-between text-[10px]">
-        <span class="font-bold text-[#143628] bg-[#eaf3ed] px-2 py-0.5 rounded border border-[#c2d8c9]">Claim #${idx + 1}</span>
-        <span class="text-[#5e7368] font-mono">Sentence [${finding.sentenceIndex}]</span>
+        <span class="font-bold text-[#09090b] bg-[#f4f4f5] px-2 py-0.5 rounded border border-[#e4e4e7]">Claim #${idx + 1}</span>
+        <span class="text-[#71717a] font-mono">Sentence [${finding.sentenceIndex}]</span>
       </div>
-      <p class="text-[#192e24] font-medium leading-relaxed">${finding.claim}</p>
-      <div class="text-[11px] font-bold text-[#25855a] pt-1">${finding.metric} • ${finding.pVal}</div>
+      <p class="text-[#09090b] font-medium leading-relaxed">${finding.claim}</p>
+      <div class="text-[11px] font-bold text-[#09090b] pt-0.5 font-mono">${finding.metric} • ${finding.pVal}</div>
     `;
     claimsEl.appendChild(card);
   });
@@ -178,7 +178,7 @@ function renderEvidenceGrounding(summary, sentences) {
     sEl.className = 'source-sentence';
     sEl.id = `source-sentence-${idx}`;
     sEl.innerHTML = `
-      <span class="text-slate-400 font-bold mr-2 select-none">[${idx}]</span>
+      <span class="text-[#a1a1aa] font-bold mr-2 select-none font-mono">[${idx}]</span>
       <span>${sentence}</span>
     `;
     viewerEl.appendChild(sEl);
@@ -192,11 +192,11 @@ function inspectSentence(sentenceIndex) {
 
 function highlightSourceSentence(sentenceIndex, claimIdx = null) {
   document.querySelectorAll('.source-sentence').forEach(el => el.classList.remove('highlighted'));
-  document.querySelectorAll('.claim-card').forEach(el => el.classList.remove('border-[#25855a]', 'bg-[#eaf3ed]/60'));
+  document.querySelectorAll('.claim-card').forEach(el => el.classList.remove('border-[#09090b]', 'bg-[#f4f4f5]'));
 
   if (claimIdx !== null) {
     const card = document.getElementById(`claim-card-${claimIdx}`);
-    if (card) card.classList.add('border-[#25855a]', 'bg-[#eaf3ed]/60');
+    if (card) card.classList.add('border-[#09090b]', 'bg-[#f4f4f5]');
   }
 
   const target = document.getElementById(`source-sentence-${sentenceIndex}`);
@@ -208,7 +208,7 @@ function highlightSourceSentence(sentenceIndex, claimIdx = null) {
 
 function clearInspectorHighlights() {
   document.querySelectorAll('.source-sentence').forEach(el => el.classList.remove('highlighted'));
-  document.querySelectorAll('.claim-card').forEach(el => el.classList.remove('border-[#25855a]', 'bg-[#eaf3ed]/60'));
+  document.querySelectorAll('.claim-card').forEach(el => el.classList.remove('border-[#09090b]', 'bg-[#f4f4f5]'));
 }
 
 /**
@@ -221,7 +221,7 @@ function renderComparisonMatrix() {
   chipsEl.innerHTML = '';
   matrix.studiesCompared.forEach(t => {
     const chip = document.createElement('span');
-    chip.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-[#eaf3ed] text-[#143628] border border-[#c2d8c9]';
+    chip.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-[#f4f4f5] text-[#09090b] border border-[#e4e4e7]';
     chip.textContent = t;
     chipsEl.appendChild(chip);
   });
@@ -232,13 +232,13 @@ function renderComparisonMatrix() {
     const div = document.createElement('div');
     div.className = 'pt-3 pb-2 first:pt-0 text-xs';
     div.innerHTML = `
-      <div class="flex items-center justify-between font-bold text-[#143628] mb-1">
+      <div class="flex items-center justify-between font-bold text-[#09090b] mb-1">
         <span>${idx + 1}. ${pt.topic}</span>
-        <span class="text-[10px] text-[#143628] bg-white px-2 py-0.5 rounded border border-[#c2d8c9]">${pt.confidence}</span>
+        <span class="text-[10px] text-[#09090b] bg-white px-2 py-0.5 rounded border border-[#e4e4e7] font-semibold">${pt.confidence}</span>
       </div>
-      <p class="text-[#5e7368] mb-2 leading-relaxed">${pt.finding}</p>
-      <div class="bg-[#f9fbf9] p-2.5 rounded-lg border border-[#e1eae4] text-[11px] font-mono">
-        <strong class="text-[#143628]">Evidence:</strong> "${pt.groundingSnippet}"
+      <p class="text-[#52525b] mb-2 leading-relaxed font-normal">${pt.finding}</p>
+      <div class="bg-[#fafafa] p-2.5 rounded-lg border border-[#e4e4e7] text-[11px] font-mono">
+        <strong class="text-[#09090b]">Evidence:</strong> "${pt.groundingSnippet}"
       </div>
     `;
     consensusEl.appendChild(div);
@@ -250,20 +250,20 @@ function renderComparisonMatrix() {
     const div = document.createElement('div');
     div.className = 'pt-3 pb-2 first:pt-0 text-xs';
     div.innerHTML = `
-      <div class="flex items-center justify-between font-bold text-[#9f1239] mb-1">
+      <div class="flex items-center justify-between font-bold text-[#09090b] mb-1">
         <span>${idx + 1}. ${ct.topic}</span>
-        <span class="text-[10px] text-[#9f1239] bg-white px-2 py-0.5 rounded border border-[#fecdd3]">${ct.status}</span>
+        <span class="text-[10px] text-[#71717a] bg-white px-2 py-0.5 rounded border border-[#e4e4e7]">${ct.status}</span>
       </div>
-      <p class="text-[#5e7368] mb-2 leading-relaxed">${ct.finding}</p>
+      <p class="text-[#52525b] mb-2 leading-relaxed">${ct.finding}</p>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px] mb-2">
-        <div class="bg-white p-2.5 rounded-lg border border-[#fecdd3]">
-          <strong class="block text-[#143628]">Study A:</strong> ${ct.evidenceA}
+        <div class="bg-white p-2.5 rounded-lg border border-[#e4e4e7]">
+          <strong class="block text-[#09090b]">Study A:</strong> ${ct.evidenceA}
         </div>
-        <div class="bg-white p-2.5 rounded-lg border border-[#fecdd3]">
-          <strong class="block text-[#143628]">Study B:</strong> ${ct.evidenceB}
+        <div class="bg-white p-2.5 rounded-lg border border-[#e4e4e7]">
+          <strong class="block text-[#09090b]">Study B:</strong> ${ct.evidenceB}
         </div>
       </div>
-      <div class="text-[11px] text-[#78350f] bg-[#fffdfa] p-2.5 rounded-lg border border-[#fde68a]">
+      <div class="text-[11px] text-[#27272a] bg-[#fafafa] p-2.5 rounded-lg border border-[#e4e4e7]">
         <strong>Clinical Impact:</strong> ${ct.clinicalImpact}
       </div>
     `;
@@ -272,7 +272,7 @@ function renderComparisonMatrix() {
 }
 
 /**
- * Render Charts
+ * Render Charts in Monochrome
  */
 function renderCharts(metricsData) {
   if (!metricsData) return;
@@ -292,7 +292,7 @@ function renderCharts(metricsData) {
       datasets: [{
         label: 'Efficacy Metric Delta',
         data: metricsData.efficacyScore,
-        backgroundColor: ['#25855a', '#86a896'],
+        backgroundColor: ['#09090b', '#71717a'],
         borderRadius: 6
       }]
     },
@@ -311,7 +311,7 @@ function renderCharts(metricsData) {
       datasets: [{
         label: 'Adverse Event %',
         data: aeData,
-        backgroundColor: ['#b45309', '#f59e0b'],
+        backgroundColor: ['#18181b', '#a1a1aa'],
         borderRadius: 6
       }]
     },
