@@ -1,30 +1,27 @@
 /*
- * PaperLensAI - Systematic Clinical Research Intelligence Suite
- * Editorial & Institutional Medical Design System
+ * PaperLensAI - Biopharmaceutical Clinical Theme
+ * Inspired by global pharma & biotech leaders (Novartis, Roche, Pfizer, AstraZeneca)
+ * Vibrant Medical Cobalt, Cyan, Bio-Emerald & Warm Coral Accents
  */
 
 :root {
-  --primary-navy: #0f172a;
-  --secondary-navy: #1e293b;
-  --slate-header: #334155;
-  --accent-teal: #0d9488;
-  --accent-blue: #0284c7;
-  --clinical-emerald: #059669;
-  --clinical-amber: #d97706;
-  --clinical-rose: #e11d48;
-  --bg-slate: #f8fafc;
-  --card-border: #e2e8f0;
-  --card-border-focus: #94a3b8;
-  --text-dark: #0f172a;
-  --text-muted: #64748b;
-  --citation-highlight-bg: #fef08a;
-  --citation-highlight-border: #ca8a04;
+  --pharma-deep-navy: #071e3d;
+  --pharma-cobalt: #1f4287;
+  --pharma-sapphire: #0c356a;
+  --pharma-cyan: #0096c7;
+  --pharma-sky: #0284c7;
+  --pharma-aqua: #00b4d8;
+  --pharma-mint: #059669;
+  --pharma-coral: #f43f5e;
+  --pharma-amber: #d97706;
+  --pharma-bg: #f0f7ff;
 }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background-color: var(--bg-slate);
-  color: var(--text-dark);
+  background: linear-gradient(160deg, #eff6ff 0%, #e0f2fe 40%, #f0fdfa 100%);
+  color: #0f172a;
+  min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -33,11 +30,50 @@ body {
   font-family: "Georgia", "Cambria", "Times New Roman", serif;
 }
 
-/* Institutional Navigation Bar */
+/* Pharma Gradient Header */
+.pharma-header {
+  background: linear-gradient(135deg, #071e3d 0%, #0c356a 55%, #0284c7 100%);
+}
+
+/* Institutional Banner */
 .gov-banner {
-  background: #0b132b;
+  background: #041226;
   font-size: 0.72rem;
   letter-spacing: 0.04em;
+}
+
+/* Pharma Card System */
+.pharma-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #bfdbfe;
+  box-shadow: 0 4px 20px -2px rgba(12, 53, 106, 0.08);
+  transition: all 0.2s ease-in-out;
+}
+
+.pharma-card:hover {
+  box-shadow: 0 8px 26px -4px rgba(12, 53, 106, 0.12);
+}
+
+/* Section Identity Accents */
+.card-objective {
+  background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%);
+  border-left: 4px solid #0284c7;
+}
+
+.card-findings {
+  background: #ffffff;
+  border-left: 4px solid #059669;
+}
+
+.card-safety {
+  background: linear-gradient(180deg, #fff7ed 0%, #ffffff 100%);
+  border-left: 4px solid #ea580c;
+}
+
+.card-takeaway {
+  background: linear-gradient(135deg, #071e3d 0%, #0c356a 100%);
+  color: #ffffff;
 }
 
 /* Interactive Citation Tag */
@@ -45,68 +81,61 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: #e0f2fe;
-  color: #0369a1;
-  border: 1px solid #bae6fd;
-  border-radius: 4px;
-  font-size: 0.7rem;
+  background-color: #0284c7;
+  color: #ffffff;
+  border-radius: 5px;
+  font-size: 0.72rem;
   font-weight: 700;
-  padding: 1px 6px;
-  margin: 0 3px;
+  padding: 2px 7px;
+  margin: 0 4px;
   cursor: pointer;
   transition: all 0.15s ease-in-out;
   text-decoration: none;
   vertical-align: super;
+  box-shadow: 0 1px 3px rgba(2, 132, 199, 0.3);
 }
 
 .citation-badge:hover {
-  background-color: #0284c7;
-  color: #ffffff;
-  border-color: #0284c7;
-  transform: translateY(-1px);
+  background-color: #0369a1;
+  transform: translateY(-1.5px) scale(1.05);
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.45);
 }
 
-.citation-badge.active {
-  background-color: #0284c7;
-  color: #ffffff;
-  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.4);
-}
-
-/* Source Sentence Highlighting in Inspector */
+/* Source Sentence Highlighting in Dual Inspector */
 .source-sentence {
-  padding: 4px 6px;
+  padding: 6px 10px;
   margin-bottom: 4px;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-  line-height: 1.6;
+  border-radius: 6px;
+  transition: all 0.25s ease;
+  line-height: 1.65;
   border-left: 3px solid transparent;
 }
 
 .source-sentence:hover {
-  background-color: #f1f5f9;
+  background-color: #e0f2fe;
 }
 
 .source-sentence.highlighted {
-  background-color: #fef3c7;
-  border-left: 3px solid #d97706;
-  color: #92400e;
-  font-weight: 500;
-  box-shadow: 0 1px 4px rgba(217, 119, 6, 0.15);
+  background-color: #fef08a;
+  border-left: 4px solid #d97706;
+  color: #78350f;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.2);
 }
 
 /* Audio Waveform Animation */
 .wave-bar {
   display: inline-block;
-  width: 3px;
+  width: 3.5px;
   height: 14px;
-  background-color: #0284c7;
-  margin: 0 1.5px;
+  background-color: #38bdf8;
+  margin: 0 2px;
   border-radius: 3px;
   transition: height 0.15s ease;
 }
 
 .wave-bar.playing {
-  animation: pulse-wave 1.1s ease-in-out infinite alternate;
+  animation: pulse-wave 1s ease-in-out infinite alternate;
 }
 
 .wave-bar:nth-child(2) { animation-delay: 0.1s; }
@@ -119,80 +148,67 @@ body {
 
 @keyframes pulse-wave {
   0% { height: 4px; }
-  50% { height: 22px; }
+  50% { height: 26px; }
   100% { height: 8px; }
 }
 
-/* Clean Custom Scrollbars */
+/* Custom Scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #e0f2fe;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
+  background: #93c5fd;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #60a5fa;
 }
 
-/* Systematic Review Table */
-.matrix-table th {
-  background-color: #f8fafc;
-  color: #475569;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border-bottom: 2px solid #e2e8f0;
+/* Pharma Pill Chips */
+.pharma-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
-.matrix-table td {
-  border-bottom: 1px solid #f1f5f9;
-  vertical-align: top;
+.pill-cyan {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #7dd3fc;
 }
 
-/* Clinical Badge styles */
-.badge-gold {
+.pill-emerald {
+  background-color: #d1fae5;
+  color: #065f46;
+  border: 1px solid #6ee7b7;
+}
+
+.pill-coral {
+  background-color: #ffe4e6;
+  color: #9f1239;
+  border: 1px solid #fda4af;
+}
+
+.pill-amber {
   background-color: #fef3c7;
   color: #92400e;
-  border: 1px solid #fde68a;
+  border: 1px solid #fcd34d;
 }
 
-.badge-emerald {
-  background-color: #ecfdf5;
-  color: #065f46;
-  border: 1px solid #a7f3d0;
-}
-
-.badge-rose {
-  background-color: #fff1f2;
-  color: #9f1239;
-  border: 1px solid #fecdd3;
-}
-
-.badge-blue {
-  background-color: #eff6ff;
-  color: #1e40af;
-  border: 1px solid #bfdbfe;
-}
-
-/* Print styling for clinical reports */
-@media print {
-  .no-print {
-    display: none !important;
-  }
-  body {
-    background-color: white !important;
-    color: black !important;
-  }
-  .print-only {
-    display: block !important;
-  }
+/* Active Workbench Tab */
+.workbench-tab.active {
+  color: #0284c7 !important;
+  border-bottom: 3px solid #0284c7 !important;
+  font-weight: 700;
 }

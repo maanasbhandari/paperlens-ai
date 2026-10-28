@@ -102,20 +102,20 @@ function renderStructuredSummary(summary) {
 
   summary.keyFindings.forEach((finding, idx) => {
     const item = document.createElement('div');
-    item.className = 'p-3 rounded-lg border border-slate-100 bg-slate-50/70 hover:bg-teal-50/30 transition';
+    item.className = 'p-3 rounded-xl border border-blue-100 bg-gradient-to-r from-blue-50/60 to-cyan-50/40 hover:from-blue-100/60 hover:to-cyan-100/50 transition';
     item.innerHTML = `
-      <div class="flex items-start justify-between gap-2">
-        <div class="text-xs text-slate-800 leading-relaxed flex-1">
-          <span class="font-bold text-slate-900">${idx + 1}.</span> ${finding.claim}
+      <div class="flex items-start justify-between gap-3">
+        <div class="text-xs text-slate-900 leading-relaxed flex-1 font-medium">
+          <span class="font-bold text-blue-950">${idx + 1}.</span> ${finding.claim}
           <button onclick="inspectSentence(${finding.sentenceIndex})" class="citation-badge" title="Inspect source sentence in evidence inspector">
             [Ref ${idx + 1}]
           </button>
         </div>
         <div class="text-right shrink-0">
-          <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-white border border-slate-200 text-teal-800 shadow-2xs">
+          <span class="inline-block px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white border border-cyan-200 text-cyan-800 shadow-2xs">
             ${finding.metric}
           </span>
-          <div class="text-[10px] font-semibold text-slate-500 mt-0.5">${finding.pVal || ''}</div>
+          <div class="text-[10px] font-bold text-slate-500 mt-0.5">${finding.pVal || ''}</div>
         </div>
       </div>
     `;
@@ -133,24 +133,24 @@ function renderEvidenceGrounding(summary, sentences) {
 
   summary.keyFindings.forEach((finding, idx) => {
     const claimCard = document.createElement('div');
-    claimCard.className = 'p-3 rounded border border-slate-200 bg-white hover:border-teal-500 cursor-pointer transition shadow-2xs mb-2 claim-card';
+    claimCard.className = 'p-3.5 rounded-xl border border-blue-200 bg-white hover:border-cyan-500 cursor-pointer transition shadow-2xs mb-2.5 claim-card';
     claimCard.id = `claim-card-${idx}`;
     claimCard.onclick = () => highlightSourceSentence(finding.sentenceIndex, idx);
     claimCard.innerHTML = `
       <div class="flex items-center justify-between mb-1.5">
-        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
+        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-50 text-cyan-800 border border-cyan-200">
           Claim #${idx + 1}
         </span>
-        <span class="text-[10px] font-mono text-slate-500">
+        <span class="text-[10px] font-mono text-slate-500 font-semibold">
           Maps to Sentence [${finding.sentenceIndex}]
         </span>
       </div>
-      <p class="text-xs text-slate-800 font-medium leading-relaxed">
+      <p class="text-xs text-blue-950 font-semibold leading-relaxed">
         ${finding.claim}
       </p>
-      <div class="mt-2 flex items-center justify-between text-[11px] text-teal-700">
-        <span class="font-bold">${finding.metric}</span>
-        <span class="font-semibold text-slate-500">${finding.pVal}</span>
+      <div class="mt-2 flex items-center justify-between text-[11px] text-cyan-800">
+        <span class="font-bold bg-blue-50 px-2 py-0.5 rounded">${finding.metric}</span>
+        <span class="font-bold text-slate-500">${finding.pVal}</span>
       </div>
     `;
     claimsListEl.appendChild(claimCard);
@@ -214,7 +214,7 @@ function renderComparisonMatrix() {
   chipsContainer.innerHTML = '';
   matrix.studiesCompared.forEach(title => {
     const chip = document.createElement('span');
-    chip.className = 'px-3 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-200';
+    chip.className = 'px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-900 border border-blue-200 shadow-2xs';
     chip.textContent = title;
     chipsContainer.appendChild(chip);
   });
@@ -224,17 +224,17 @@ function renderComparisonMatrix() {
   consensusList.innerHTML = '';
   matrix.consensusPoints.forEach((pt, idx) => {
     const item = document.createElement('div');
-    item.className = 'pt-3 pb-2 first:pt-0';
+    item.className = 'pt-3.5 pb-2 first:pt-0';
     item.innerHTML = `
       <div class="flex items-start justify-between">
-        <h5 class="text-xs font-bold text-slate-900">${idx + 1}. ${pt.topic}</h5>
-        <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+        <h5 class="text-xs font-bold text-blue-950">${idx + 1}. ${pt.topic}</h5>
+        <span class="text-[10px] font-bold text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded-full border border-emerald-300">
           ${pt.confidence}
         </span>
       </div>
-      <p class="text-xs text-slate-700 mt-1 leading-relaxed">${pt.finding}</p>
-      <div class="mt-2 text-[11px] text-slate-500 font-mono bg-slate-50 p-2 rounded border border-slate-200">
-        <span class="font-bold text-teal-800">Grounding Evidence:</span> "${pt.groundingSnippet}"
+      <p class="text-xs text-slate-700 mt-1 leading-relaxed font-medium">${pt.finding}</p>
+      <div class="mt-2 text-[11px] text-slate-700 font-mono bg-blue-50/60 p-2.5 rounded-lg border border-blue-100">
+        <span class="font-bold text-cyan-800">Grounding Evidence:</span> "${pt.groundingSnippet}"
       </div>
     `;
     consensusList.appendChild(item);
@@ -245,28 +245,28 @@ function renderComparisonMatrix() {
   contradictionsList.innerHTML = '';
   matrix.contradictionPoints.forEach((ct, idx) => {
     const item = document.createElement('div');
-    item.className = 'pt-3 pb-2 first:pt-0';
+    item.className = 'pt-3.5 pb-2 first:pt-0';
     item.innerHTML = `
       <div class="flex items-start justify-between">
-        <h5 class="text-xs font-bold text-slate-900">${idx + 1}. ${ct.topic}</h5>
-        <span class="text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+        <h5 class="text-xs font-bold text-rose-950">${idx + 1}. ${ct.topic}</h5>
+        <span class="text-[10px] font-bold text-rose-800 bg-rose-100/70 px-2 py-0.5 rounded-full border border-rose-300">
           ${ct.status}
         </span>
       </div>
-      <p class="text-xs text-slate-700 mt-1 leading-relaxed">${ct.finding}</p>
+      <p class="text-xs text-slate-700 mt-1 leading-relaxed font-medium">${ct.finding}</p>
       
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2.5">
-        <div class="bg-slate-50 p-2.5 rounded border border-slate-200 text-[11px]">
-          <span class="font-bold text-slate-800 block mb-0.5">Trial Evidence A:</span>
-          <span class="text-slate-600">${ct.evidenceA}</span>
+        <div class="bg-blue-50/60 p-2.5 rounded-lg border border-blue-200/80 text-[11px]">
+          <span class="font-bold text-blue-950 block mb-0.5">Trial Evidence A:</span>
+          <span class="text-slate-700">${ct.evidenceA}</span>
         </div>
-        <div class="bg-slate-50 p-2.5 rounded border border-slate-200 text-[11px]">
-          <span class="font-bold text-slate-800 block mb-0.5">Trial Evidence B:</span>
-          <span class="text-slate-600">${ct.evidenceB}</span>
+        <div class="bg-blue-50/60 p-2.5 rounded-lg border border-blue-200/80 text-[11px]">
+          <span class="font-bold text-blue-950 block mb-0.5">Trial Evidence B:</span>
+          <span class="text-slate-700">${ct.evidenceB}</span>
         </div>
       </div>
 
-      <div class="mt-2 text-[11px] text-amber-900 bg-amber-50/80 p-2 rounded border border-amber-200 flex items-start">
+      <div class="mt-2.5 text-[11px] text-amber-950 bg-amber-50 p-2.5 rounded-lg border border-amber-200 flex items-start">
         <i data-lucide="alert-triangle" class="w-3.5 h-3.5 mr-1.5 text-amber-600 shrink-0 mt-0.5"></i>
         <span><strong>Clinical Impact:</strong> ${ct.clinicalImpact}</span>
       </div>
