@@ -48,16 +48,35 @@
       </button>
     </div>
 
-    <!-- New Analysis Button -->
-    <div class="p-3">
+    <!-- New Analysis & Previous Conversations Buttons -->
+    <div class="p-3 space-y-2">
       <button onclick="navigateTo('home')" class="w-full py-2.5 px-3 rounded-lg bg-white hover:bg-[#e4e4e7] text-[#09090b] font-bold text-xs flex items-center justify-center space-x-2 shadow transition">
         <i data-lucide="plus" class="w-4 h-4"></i>
         <span>New Analysis</span>
       </button>
+
+      <button id="toggleHistoryBtn" onclick="toggleSidebarHistory()" class="w-full py-2 px-3 rounded-lg bg-[#18181b] hover:bg-[#27272a] text-[#d4d4d8] font-medium text-xs flex items-center justify-between transition border border-[#27272a]">
+        <span class="flex items-center space-x-2">
+          <i data-lucide="history" class="w-3.5 h-3.5 text-[#a1a1aa]"></i>
+          <span>Previous Conversations</span>
+        </span>
+        <span id="historyCountBadge" class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-[#27272a] text-[#d4d4d8]">0</span>
+      </button>
+    </div>
+
+    <!-- Live Previous Conversations List (Antigravity Style) -->
+    <div id="sidebarHistoryContainer" class="hidden px-3 py-1 flex-1 overflow-y-auto space-y-1 border-t border-[#18181b]">
+      <div class="flex items-center justify-between text-[10px] uppercase font-bold text-[#71717a] px-2 py-1 tracking-wider">
+        <span>Recent Conversations</span>
+        <button onclick="clearAllHistory()" class="hover:text-red-400 transition" title="Clear all history">Clear</button>
+      </div>
+      <div id="historyListEl" class="space-y-1">
+        <!-- Dynamically rendered conversation sessions -->
+      </div>
     </div>
 
     <!-- Navigation Menu (All Options on the Left) -->
-    <nav class="flex-1 px-3 py-2 space-y-1 text-xs">
+    <nav id="sidebarNavOptions" class="flex-1 px-3 py-2 space-y-1 text-xs">
       <div class="text-[10px] uppercase font-bold text-[#71717a] px-3 py-1 tracking-wider">Analysis Options</div>
       
       <button onclick="navigateTo('home')" id="nav-home" class="nav-item active w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-lg transition text-left">

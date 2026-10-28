@@ -1,6 +1,6 @@
 /*
  * PaperLensAI - Left Sidebar Multi-Page Monochrome Design System (Black & White)
- * Inspired by Linear, Vercel & Apple Healthtech
+ * Inspired by Antigravity, Linear & Vercel
  * Typography: Plus Jakarta Sans + JetBrains Mono
  */
 
@@ -47,6 +47,42 @@ body {
 
 .nav-item.active i {
   color: #09090b !important;
+}
+
+/* History Conversation Items (Antigravity Style) */
+.history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: #d4d4d8;
+  font-size: 0.76rem;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.history-item:hover {
+  background-color: #18181b;
+  border-color: #27272a;
+  color: #ffffff;
+}
+
+.history-item.active {
+  background-color: #27272a;
+  border-color: #3f3f46;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.history-item .delete-btn {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.history-item:hover .delete-btn {
+  opacity: 1;
 }
 
 /* Cards */
@@ -164,21 +200,21 @@ body {
 
 /* Scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f4f4f5;
+  background: #18181b;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d4d4d8;
+  background: #3f3f46;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a1a1aa;
+  background: #71717a;
 }
 
 /* Fade in */

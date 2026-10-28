@@ -9,6 +9,8 @@ const appState = {
   selectedFile: null,
   inputMode: 'upload', // 'upload' | 'paste'
   selectedAngle: '',
+  isHistoryOpen: false,
+  history: [],
   audio: {
     isPlaying: false,
     utterance: null,
@@ -30,9 +32,188 @@ document.addEventListener('DOMContentLoaded', () => {
     apiKeyInput.value = savedKey;
   }
 
+  // Initialize Conversation History (Antigravity Style)
+  initHistory();
+
   // Start on clean Home Page (Left Sidebar Navigation)
   navigateTo('home');
 });
+
+/**
+ * Antigravity-Style Previous Conversations History System
+ */
+function initHistory() {
+  const stored = localStorage.getItem('paperlens_chat_history');
+  if (stored) {
+    try {
+      appState.history = JSON.parse(stored);
+    } catch (e) {
+      appState.history = [];
+    }
+  }
+
+  // If empty, seed with 3 realistic landmark trial sessions
+  if (!appState.history || appState.history.length === 0) {
+    appState.history = [
+      {
+        id: "hist-step-hfpef",
+        title: "STEP-HFpEF: Semaglutide in Obesity HFpEF",
+        time: "10m ago",
+        timestamp: Date.now() - 1000 * 60 * 10,
+        paperData: SAMPLE_PAPERS[0]
+      },
+      {
+        id: "hist-dapa-hf",
+        title: "DAPA-HF: Dapagliflozin in Reduced EF",
+        time: "2h ago",
+        timestamp: Date.now() - 1000 * 60 * 120,
+        paperData: SAMPLE_PAPERS[1]
+      },
+      {
+        id: "hist-empa-reg",
+        title: "EMPA-REG: Empagliflozin Mortality Trial",
+        time: "Yesterday",
+        timestamp: Date.now() - 1000 * 60 * 60 * 24,
+        paperData: SAMPLE_PAPERS[2]
+      }
+    ];
+    saveHistoryToStorage();
+  }
+
+  updateHistoryBadge();
+}
+
+function saveHistoryToStorage() {
+  localStorage.setItem('paperlens_chat_history', JSON.stringify(appState.history));
+  updateHistoryBadge();
+}
+
+function updateHistoryBadge() {
+  const badge = document.getElementById('historyCountBadge');
+  if (badge) badge.textContent = appState.history.length;
+}
+
+function toggleSidebarHistory() {
+  appState.isHistoryOpen = !appState.isHistoryOpen;
+  const historyContainer = document.getElementById('sidebarHistoryContainer');
+  const navOptions = document.getElementById('sidebarNavOptions');
+  const btn = document.getElementById('toggleHistoryBtn');
+
+  if (appState.isHistoryOpen) {
+    historyContainer.classList.remove('hidden');
+    navOptions.classList.add('hidden');
+    btn.classList.add('bg-[#27272a]', 'text-white', 'border-white');
+    renderHistoryList();
+  } else {
+    historyContainer.classList.add('hidden');
+    navOptions.classList.remove('hidden');
+    btn.classList.remove('bg-[#27272a]', 'text-white', 'border-white');
+  }
+
+  if (window.lucide) window.lucide.createIcons();
+}
+
+function renderHistoryList() {
+  const listEl = document.getElementById('historyListEl');
+  if (!listEl) return;
+  listEl.innerHTML = '';
+
+  if (appState.history.length === 0) {
+    listEl.innerHTML = `<div class="p-3 text-[11px] text-[#71717a] text-center italic">No previous conversations yet.</div>`;
+    return;
+  }
+
+  appState.history.forEach((session, idx) => {
+    const isActive = appState.currentPaper && appState.currentPaper.id === session.paperData?.id;
+    const item = document.createElement('div');
+    item.className = `history-item ${isActive ? 'active' : ''}`;
+    item.onclick = () => loadHistorySession(session.id);
+    item.innerHTML = `
+      <div class="flex items-center space-x-2 truncate flex-1 pr-2">
+        <i data-lucide="message-square" class="w-3.5 h-3.5 text-[#71717a] shrink-0"></i>
+        <div class="truncate">
+          <div class="truncate font-medium text-white">${session.title}</div>
+          <div class="text-[10px] text-[#71717a]">${session.time}</div>
+        </div>
+      </div>
+      <button onclick="deleteHistoryItem('${session.id}', event)" class="delete-btn text-[#71717a] hover:text-red-400 p-1" title="Delete conversation">
+        <i data-lucide="trash-2" class="w-3 h-3"></i>
+      </button>
+    `;
+    listEl.appendChild(item);
+  });
+
+  if (window.lucide) window.lucide.createIcons();
+}
+
+function loadHistorySession(sessionId) {
+  const session = appState.history.find(h => h.id === sessionId);
+  if (!session || !session.paperData) return;
+
+  const paper = session.paperData;
+  appState.currentPaper = paper;
+  appState.activeSentences = paper.sentences;
+
+  // Update Header Badge
+  const badge = document.getElementById('activeStudyBadge');
+  if (badge) {
+    badge.textContent = `Active: ${paper.title.substring(0, 32)}...`;
+    badge.classList.remove('hidden');
+  }
+
+  // Populate Structured Summary
+  document.getElementById('studyTitleHeading').textContent = paper.title;
+  document.getElementById('studyAuthorsP').textContent = `${paper.authors} | DOI: ${paper.doi} | PMID: ${paper.pmid}`;
+  document.getElementById('summaryPhaseBadge').textContent = paper.phase;
+  document.getElementById('summaryJournalBadge').textContent = `${paper.journal} ${paper.year}`;
+  document.getElementById('summarySampleBadge').textContent = `N = ${paper.sampleSize.toLocaleString()}`;
+  document.getElementById('groundingScoreValue').textContent = paper.structuredSummary.groundingFidelity;
+
+  renderStructuredSummary(paper.structuredSummary);
+  renderEvidenceGrounding(paper.structuredSummary, paper.sentences);
+  renderComparisonMatrix();
+  renderCharts(paper.metricsData);
+
+  const script = window.paperLensEngine.generateAudioBriefingScript(paper.structuredSummary);
+  document.getElementById('audioScriptText').textContent = `"${script}"`;
+
+  // Switch back to analysis views in the sidebar and navigate to summary
+  appState.isHistoryOpen = false;
+  document.getElementById('sidebarHistoryContainer').classList.add('hidden');
+  document.getElementById('sidebarNavOptions').classList.remove('hidden');
+  document.getElementById('toggleHistoryBtn').classList.remove('bg-[#27272a]', 'text-white', 'border-white');
+
+  navigateTo('summary');
+}
+
+function deleteHistoryItem(sessionId, event) {
+  event.stopPropagation();
+  appState.history = appState.history.filter(h => h.id !== sessionId);
+  saveHistoryToStorage();
+  renderHistoryList();
+}
+
+function clearAllHistory() {
+  if (confirm("Clear all previous conversations?")) {
+    appState.history = [];
+    saveHistoryToStorage();
+    renderHistoryList();
+  }
+}
+
+function addSessionToHistory(paper) {
+  if (!paper) return;
+  const newSession = {
+    id: "hist-" + Date.now(),
+    title: paper.title ? (paper.title.length > 36 ? paper.title.substring(0, 36) + "..." : paper.title) : "Clinical Study",
+    time: "Just now",
+    timestamp: Date.now(),
+    paperData: paper
+  };
+  // Prepend
+  appState.history.unshift(newSession);
+  saveHistoryToStorage();
+}
 
 /**
  * Multi-Page Navigation Router (Controlled by Left Sidebar)
@@ -110,6 +291,9 @@ function loadSamplePaper(paperId) {
   // Audio script
   const script = window.paperLensEngine.generateAudioBriefingScript(paper.structuredSummary);
   document.getElementById('audioScriptText').textContent = `"${script}"`;
+
+  // Track in previous conversations
+  addSessionToHistory(paper);
 
   // Navigate to summary page
   navigateTo('summary');
@@ -516,6 +700,9 @@ async function runClinicalSynthesis() {
 
     const script = window.paperLensEngine.generateAudioBriefingScript(result);
     document.getElementById('audioScriptText').textContent = `"${script}"`;
+
+    // Save session to Previous Conversations history (Antigravity Style)
+    addSessionToHistory(newPaper);
 
     // Navigate to summary on left sidebar
     navigateTo('summary');
