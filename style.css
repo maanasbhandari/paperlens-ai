@@ -1,5 +1,5 @@
 /*
- * PaperLensAI - Ultra-Premium Monochrome Design System (Black & White)
+ * PaperLensAI - Left Sidebar Multi-Page Monochrome Design System (Black & White)
  * Inspired by Linear, Vercel & Apple Healthtech
  * Typography: Plus Jakarta Sans + JetBrains Mono
  */
@@ -14,10 +14,8 @@
   --border-strong: #27272a;
   --black-solid: #09090b;
   --black-hover: #18181b;
-  --zinc-100: #f4f4f5;
-  --zinc-200: #e4e4e7;
-  --zinc-800: #27272a;
-  --zinc-900: #18181b;
+  --sidebar-bg: #09090b;
+  --sidebar-border: #27272a;
 }
 
 body {
@@ -28,24 +26,27 @@ body {
   min-height: 100vh;
 }
 
-/* Subtle background grid pattern to prevent emptiness */
-.bg-grid-pattern {
-  background-image: radial-gradient(#d4d4d8 1px, transparent 1px);
-  background-size: 24px 24px;
+/* Sidebar Navigation Items */
+.nav-item {
+  color: #a1a1aa;
+  font-weight: 500;
+  transition: all 0.15s ease-in-out;
 }
 
-/* Top Announcement Pill */
-.announcement-pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 12px;
+.nav-item:hover:not(.active) {
+  background-color: #18181b;
+  color: #ffffff;
+}
+
+.nav-item.active {
   background-color: #ffffff;
-  border: 1px solid var(--border-subtle);
-  border-radius: 9999px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  color: #09090b !important;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.nav-item.active i {
+  color: #09090b !important;
 }
 
 /* Cards */
@@ -89,34 +90,6 @@ body {
   border-color: #d4d4d8;
 }
 
-/* Option Tabs (Screen 2 Navigation) */
-.option-tab-btn {
-  display: inline-flex;
-  align-items: center;
-  padding: 10px 18px;
-  border-radius: 10px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  border: 1px solid var(--border-subtle);
-  background-color: #ffffff;
-  color: var(--text-secondary);
-  transition: all 0.15s ease-in-out;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.option-tab-btn:hover {
-  background-color: #f4f4f5;
-  color: var(--text-primary);
-}
-
-.option-tab-btn.active {
-  background-color: var(--black-solid);
-  color: #ffffff !important;
-  border-color: var(--black-solid);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
 /* Citation Tag */
 .citation-badge {
   display: inline-flex;
@@ -155,7 +128,7 @@ body {
 }
 
 .source-sentence.highlighted {
-  background-color: #18181b;
+  background-color: #09090b;
   border-left: 4px solid #000000;
   color: #ffffff;
   font-weight: 500;
@@ -214,6 +187,6 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }

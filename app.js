@@ -1,14 +1,14 @@
 /**
- * PaperLensAI - Screen 1 (Intake) to Screen 2 (Results & Multi-Option Navigation)
+ * PaperLensAI - Left Sidebar Multi-Page Controller (Black & White Theme)
  */
 
 const appState = {
-  activeScreen: 'intake', // 'intake' | 'results'
-  activeResultOption: 'summary', // 'summary' | 'grounding' | 'matrix' | 'charts' | 'audio'
+  currentView: 'home', // 'home' | 'summary' | 'grounding' | 'matrix' | 'charts' | 'audio'
   currentPaper: null,
   activeSentences: [],
   selectedFile: null,
   inputMode: 'upload', // 'upload' | 'paste'
+  selectedAngle: '',
   audio: {
     isPlaying: false,
     utterance: null,
@@ -30,55 +30,50 @@ document.addEventListener('DOMContentLoaded', () => {
     apiKeyInput.value = savedKey;
   }
 
-  // Ensure initial state is clean Screen 1 ONLY
-  resetToIntakeScreen();
+  // Start on clean Home Page (Left Sidebar Navigation)
+  navigateTo('home');
 });
 
 /**
- * Screen 1 -> Screen 2 Transitions
+ * Multi-Page Navigation Router (Controlled by Left Sidebar)
  */
-function showResultsScreen() {
-  appState.activeScreen = 'results';
-  document.getElementById('screen-intake').classList.add('hidden');
-  document.getElementById('screen-results').classList.remove('hidden');
+function navigateTo(viewId) {
+  appState.currentView = viewId;
 
-  // Default to summary option on results screen
-  switchResultOption('summary');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+  // Hide all page views
+  document.querySelectorAll('.page-view').forEach(el => el.classList.add('hidden'));
 
-function resetToIntakeScreen() {
-  appState.activeScreen = 'intake';
-  document.getElementById('screen-results').classList.add('hidden');
-  document.getElementById('screen-intake').classList.remove('hidden');
+  // Show target page view
+  const targetPage = document.getElementById(`page-${viewId}`);
+  if (targetPage) targetPage.classList.remove('hidden');
 
-  // Stop any ongoing audio
-  stopAudioBriefing();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+  // Update Left Sidebar Active Nav State
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const activeNav = document.getElementById(`nav-${viewId}`);
+  if (activeNav) activeNav.classList.add('active');
 
-/**
- * Screen 2 Option Navigation Switcher
- */
-function switchResultOption(optionId) {
-  appState.activeResultOption = optionId;
+  // Update Top Bar Title
+  const titles = {
+    home: 'New Clinical Analysis',
+    summary: '1. Clinical Summary',
+    grounding: '2. Evidence Grounding & Source Inspector',
+    matrix: '3. Cross-Trial Contradiction & Consensus Matrix',
+    charts: '4. Quantitative Endpoint Charts',
+    audio: '5. Clinical Audio Briefing ("Podcast Mode")'
+  };
+  const titleEl = document.getElementById('currentViewTitle');
+  if (titleEl) titleEl.textContent = titles[viewId] || 'PaperLensAI';
 
-  // Update Buttons
-  document.querySelectorAll('.option-tab-btn').forEach(btn => btn.classList.remove('active'));
-  const activeBtn = document.getElementById(`opt-${optionId}`);
-  if (activeBtn) activeBtn.classList.add('active');
-
-  // Update Result Views
-  document.querySelectorAll('.result-view').forEach(view => view.classList.add('hidden'));
-  const activeView = document.getElementById(`view-${optionId}`);
-  if (activeView) activeView.classList.remove('hidden');
-
-  // Resize charts if opening charts view
-  if (optionId === 'charts' && appState.currentPaper) {
+  // Resize charts if opening charts page
+  if (viewId === 'charts' && appState.currentPaper) {
     setTimeout(() => renderCharts(appState.currentPaper.metricsData), 80);
   }
 
   if (window.lucide) window.lucide.createIcons();
+}
+
+function resetToIntakeScreen() {
+  navigateTo('home');
 }
 
 /**
@@ -91,15 +86,22 @@ function loadSamplePaper(paperId) {
   appState.currentPaper = paper;
   appState.activeSentences = paper.sentences;
 
-  // Populate Screen 2 Top Bar
-  document.getElementById('resTitleHeading').textContent = paper.title;
-  document.getElementById('resAuthorsP').textContent = `${paper.authors} | DOI: ${paper.doi} | PMID: ${paper.pmid}`;
-  document.getElementById('resPhaseBadge').textContent = paper.phase;
-  document.getElementById('resJournalBadge').textContent = `${paper.journal} ${paper.year}`;
-  document.getElementById('resSampleBadge').textContent = `N = ${paper.sampleSize.toLocaleString()} Enrolled`;
-  document.getElementById('resGroundingScore').textContent = paper.structuredSummary.groundingFidelity;
+  // Update Header Active Badge
+  const badge = document.getElementById('activeStudyBadge');
+  if (badge) {
+    badge.textContent = `Active: ${paper.title.substring(0, 32)}...`;
+    badge.classList.remove('hidden');
+  }
 
-  // Render Sub-Views
+  // Populate Structured Summary
+  document.getElementById('studyTitleHeading').textContent = paper.title;
+  document.getElementById('studyAuthorsP').textContent = `${paper.authors} | DOI: ${paper.doi} | PMID: ${paper.pmid}`;
+  document.getElementById('summaryPhaseBadge').textContent = paper.phase;
+  document.getElementById('summaryJournalBadge').textContent = `${paper.journal} ${paper.year}`;
+  document.getElementById('summarySampleBadge').textContent = `N = ${paper.sampleSize.toLocaleString()}`;
+  document.getElementById('groundingScoreValue').textContent = paper.structuredSummary.groundingFidelity;
+
+  // Render All Sub-Pages
   renderStructuredSummary(paper.structuredSummary);
   renderEvidenceGrounding(paper.structuredSummary, paper.sentences);
   renderComparisonMatrix();
@@ -109,8 +111,8 @@ function loadSamplePaper(paperId) {
   const script = window.paperLensEngine.generateAudioBriefingScript(paper.structuredSummary);
   document.getElementById('audioScriptText').textContent = `"${script}"`;
 
-  // Transition to Screen 2
-  showResultsScreen();
+  // Navigate to summary page
+  navigateTo('summary');
 }
 
 /**
@@ -186,7 +188,7 @@ function renderEvidenceGrounding(summary, sentences) {
 }
 
 function inspectSentence(sentenceIndex) {
-  switchResultOption('grounding');
+  navigateTo('grounding');
   highlightSourceSentence(sentenceIndex);
 }
 
@@ -385,8 +387,8 @@ function setPlaybackSpeed(speed) {
   [1.0, 1.25, 1.5].forEach(s => {
     const btn = document.getElementById(`speedBtn${s === 1.0 ? '1' : s === 1.25 ? '125' : '15'}`);
     if (btn) {
-      if (s === speed) btn.className = 'px-2.5 py-0.5 rounded font-bold bg-[#25855a] text-white';
-      else btn.className = 'px-2.5 py-0.5 rounded text-[#86a896] hover:text-white';
+      if (s === speed) btn.className = 'px-2.5 py-0.5 rounded font-bold bg-white text-[#09090b]';
+      else btn.className = 'px-2.5 py-0.5 rounded text-[#a1a1aa] hover:text-white';
     }
   });
   if (appState.audio.isPlaying) startAudioBriefing();
@@ -409,13 +411,13 @@ function switchInputMode(mode) {
   if (mode === 'upload') {
     dropZone.classList.remove('hidden');
     pasteArea.classList.add('hidden');
-    uploadBtn.className = 'font-bold text-[#143628] border-b-2 border-[#143628] pb-1 flex items-center';
-    pasteBtn.className = 'font-medium text-[#5e7368] hover:text-[#143628] pb-1 flex items-center';
+    uploadBtn.className = 'font-bold text-[#09090b] border-b-2 border-[#09090b] pb-1 flex items-center';
+    pasteBtn.className = 'font-medium text-[#71717a] hover:text-[#09090b] pb-1 flex items-center';
   } else {
     dropZone.classList.add('hidden');
     pasteArea.classList.remove('hidden');
-    pasteBtn.className = 'font-bold text-[#143628] border-b-2 border-[#143628] pb-1 flex items-center';
-    uploadBtn.className = 'font-medium text-[#5e7368] hover:text-[#143628] pb-1 flex items-center';
+    pasteBtn.className = 'font-bold text-[#09090b] border-b-2 border-[#09090b] pb-1 flex items-center';
+    uploadBtn.className = 'font-medium text-[#71717a] hover:text-[#09090b] pb-1 flex items-center';
   }
 }
 
@@ -434,8 +436,13 @@ function clearSelectedFile(event) {
   document.getElementById('selectedFileInfo').classList.add('hidden');
 }
 
+function setClinicalAngle(angle) {
+  appState.selectedAngle = angle;
+  document.getElementById('customAngleInput').value = angle;
+}
+
 /**
- * Run Clinical Synthesis -> Transitions immediately to Screen 2!
+ * Run Clinical Synthesis -> Navigates to Clinical Summary
  */
 async function runClinicalSynthesis() {
   const customQuery = document.getElementById('customAngleInput').value.trim();
@@ -462,7 +469,6 @@ async function runClinicalSynthesis() {
       return;
     }
 
-    // Call Engine
     const result = await window.paperLensEngine.analyzePaper(textToAnalyze, {
       title: paperTitle,
       clinicalAngle: customQuery,
@@ -488,25 +494,31 @@ async function runClinicalSynthesis() {
     appState.currentPaper = newPaper;
     appState.activeSentences = result.sentences;
 
-    // Populate Screen 2 Top Bar
-    document.getElementById('resTitleHeading').textContent = newPaper.title;
-    document.getElementById('resAuthorsP').textContent = `Clinical Ingestion Pipeline | ${newPaper.sentences.length} sentences extracted`;
-    document.getElementById('resPhaseBadge').textContent = newPaper.phase;
-    document.getElementById('resJournalBadge').textContent = newPaper.journal;
-    document.getElementById('resSampleBadge').textContent = `N = ${newPaper.sampleSize}`;
-    document.getElementById('resGroundingScore').textContent = result.groundingFidelity;
+    // Update active badge in top bar
+    const badge = document.getElementById('activeStudyBadge');
+    if (badge) {
+      badge.textContent = `Active: ${paperTitle.substring(0, 30)}...`;
+      badge.classList.remove('hidden');
+    }
 
-    // Render Sub-Views
+    // Populate and switch to summary view
+    document.getElementById('studyTitleHeading').textContent = newPaper.title;
+    document.getElementById('studyAuthorsP').textContent = `${newPaper.authors} | ${newPaper.sentences.length} sentences extracted`;
+    document.getElementById('summaryPhaseBadge').textContent = newPaper.phase;
+    document.getElementById('summaryJournalBadge').textContent = newPaper.journal;
+    document.getElementById('summarySampleBadge').textContent = `N = ${newPaper.sampleSize}`;
+    document.getElementById('groundingScoreValue').textContent = result.groundingFidelity;
+
     renderStructuredSummary(result);
     renderEvidenceGrounding(result, result.sentences);
-    renderComparisonMatrix();
     renderCharts(result.metricsData);
+    renderComparisonMatrix();
 
     const script = window.paperLensEngine.generateAudioBriefingScript(result);
     document.getElementById('audioScriptText').textContent = `"${script}"`;
 
-    // Transition immediately to Screen 2
-    showResultsScreen();
+    // Navigate to summary on left sidebar
+    navigateTo('summary');
 
   } catch (err) {
     console.error("Synthesis error:", err);
