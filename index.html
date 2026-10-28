@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PaperLensAI — Clinical Literature Intelligence & Systematic Synthesis Suite</title>
+  <title>PaperLensAI — Medical Literature Intelligence</title>
   
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -11,716 +11,438 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   
-  <!-- Chart.js for Quantitative Visualizations -->
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
-  <!-- PDF.js for in-browser client-side PDF parsing -->
+  <!-- PDF.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="min-h-screen flex flex-col antialiased">
+<body class="min-h-screen flex flex-col md:flex-row antialiased bg-slate-100 text-slate-800">
 
-  <!-- Top Institutional Bar -->
-  <div class="gov-banner text-slate-300 py-1.5 px-4 sm:px-8 flex justify-between items-center text-xs">
-    <div class="flex items-center space-x-3">
-      <span class="inline-flex items-center text-cyan-400 font-bold tracking-wide">
-        <i data-lucide="shield-check" class="w-3.5 h-3.5 mr-1 text-cyan-400"></i>
-        CLINICAL SYSTEMATIC REVIEW SUITE
-      </span>
-      <span class="text-slate-600">|</span>
-      <span class="hidden md:inline text-slate-300">Evidence Grounding & Cross-Trial Synthesis</span>
-    </div>
-    <div class="flex items-center space-x-4">
-      <span class="flex items-center text-emerald-400 font-medium">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span>
-        Zero Hallucination Grounding
-      </span>
-      <button onclick="openSettingsModal()" class="text-cyan-300 hover:text-white transition flex items-center font-semibold">
-        <i data-lucide="key" class="w-3.5 h-3.5 mr-1"></i> API Settings
-      </button>
-    </div>
-  </div>
-
-  <!-- Pharma Navigation Header -->
-  <header class="pharma-header text-white sticky top-0 z-40 shadow-md">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center">
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 text-white flex items-center justify-center font-bold text-xl shadow-lg border border-cyan-300/30">
-          <i data-lucide="microscope" class="w-6 h-6 text-white"></i>
+  <!-- Sidebar (ChatGPT / Gemini Style) -->
+  <aside class="w-full md:w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 border-r border-slate-800 shadow-xl z-20">
+    <!-- Brand Header -->
+    <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+      <div class="flex items-center space-x-2.5">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold shadow">
+          <i data-lucide="microscope" class="w-5 h-5 text-white"></i>
         </div>
         <div>
-          <div class="flex items-center space-x-2">
-            <h1 class="text-xl sm:text-2xl font-black tracking-tight text-white">PaperLens<span class="text-cyan-400">AI</span></h1>
-            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-cyan-900/80 text-cyan-200 border border-cyan-400/30">Pharma v2.4</span>
-          </div>
-          <p class="text-xs text-cyan-100 font-medium">Medical Literature Intelligence & Consensus Matrix</p>
+          <h1 class="text-base font-bold text-white tracking-tight">PaperLens<span class="text-cyan-400">AI</span></h1>
+          <p class="text-[10px] text-cyan-200">Clinical Intelligence</p>
         </div>
       </div>
+      <button onclick="openSettingsModal()" class="text-slate-400 hover:text-white transition p-1">
+        <i data-lucide="settings" class="w-4 h-4"></i>
+      </button>
+    </div>
 
-      <!-- Action Buttons -->
-      <div class="flex items-center space-x-2 sm:space-x-3">
-        <button onclick="triggerQuickAudioBriefing()" class="inline-flex items-center px-3 py-1.5 text-xs font-bold rounded-lg bg-cyan-500/20 text-cyan-200 border border-cyan-400/40 hover:bg-cyan-500/30 transition shadow-sm">
-          <i data-lucide="volume-2" class="w-4 h-4 mr-1.5 text-cyan-300"></i>
-          <span>Audio Briefing</span>
+    <!-- New Analysis Action -->
+    <div class="p-3">
+      <button onclick="navigateTo('home')" class="w-full py-2.5 px-3 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs flex items-center justify-center space-x-2 shadow transition">
+        <i data-lucide="plus" class="w-4 h-4"></i>
+        <span>New Analysis</span>
+      </button>
+    </div>
+
+    <!-- Navigation Menu (Pages) -->
+    <nav class="flex-1 px-3 py-2 space-y-1 text-xs">
+      <div class="text-[10px] uppercase font-bold text-slate-500 px-3 py-1">Pages</div>
+      
+      <button onclick="navigateTo('home')" id="nav-home" class="nav-item active w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-slate-300 transition text-left">
+        <i data-lucide="message-square" class="w-4 h-4 text-cyan-400"></i>
+        <span>Upload & Prompt</span>
+      </button>
+
+      <button onclick="navigateTo('summary')" id="nav-summary" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-slate-300 transition text-left">
+        <i data-lucide="file-text" class="w-4 h-4 text-emerald-400"></i>
+        <span>Clinical Summary</span>
+      </button>
+
+      <button onclick="navigateTo('grounding')" id="nav-grounding" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-slate-300 transition text-left">
+        <i data-lucide="shield-check" class="w-4 h-4 text-amber-400"></i>
+        <span>Evidence Grounding</span>
+      </button>
+
+      <button onclick="navigateTo('matrix')" id="nav-matrix" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-slate-300 transition text-left">
+        <i data-lucide="scale" class="w-4 h-4 text-purple-400"></i>
+        <span>Contradiction Matrix</span>
+      </button>
+
+      <button onclick="navigateTo('charts')" id="nav-charts" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-slate-300 transition text-left">
+        <i data-lucide="bar-chart-2" class="w-4 h-4 text-blue-400"></i>
+        <span>Dynamic Charts</span>
+      </button>
+
+      <button onclick="navigateTo('audio')" id="nav-audio" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-slate-300 transition text-left">
+        <i data-lucide="headphones" class="w-4 h-4 text-rose-400"></i>
+        <span>Audio Briefing</span>
+      </button>
+    </nav>
+
+    <!-- Quick Sample Benchmarks at Bottom -->
+    <div class="p-3 border-t border-slate-800 text-[11px] bg-slate-950/40">
+      <div class="text-[10px] uppercase font-bold text-slate-500 mb-2">Try Sample Trials</div>
+      <div class="space-y-1">
+        <button onclick="loadSamplePaper('step-hfpef-2023')" class="w-full text-left truncate px-2.5 py-1.5 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">
+          • STEP-HFpEF (Semaglutide)
         </button>
-        <button onclick="exportClinicalReport()" class="inline-flex items-center px-3 py-1.5 text-xs font-bold rounded-lg bg-white/10 text-white border border-white/20 hover:bg-white/20 transition shadow-sm">
-          <i data-lucide="printer" class="w-4 h-4 mr-1.5 text-slate-200"></i>
-          <span class="hidden sm:inline">Print Report</span>
+        <button onclick="loadSamplePaper('dapa-hf-2019')" class="w-full text-left truncate px-2.5 py-1.5 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">
+          • DAPA-HF (Dapagliflozin)
         </button>
-        <button onclick="toggleIntakeDrawer()" class="inline-flex items-center px-3.5 py-1.5 text-xs font-bold rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white transition shadow-md">
-          <i data-lucide="file-plus" class="w-4 h-4 mr-1.5"></i>
-          <span>Upload / Intake</span>
+        <button onclick="loadSamplePaper('empa-reg-2015')" class="w-full text-left truncate px-2.5 py-1.5 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">
+          • EMPA-REG (Empagliflozin)
         </button>
       </div>
     </div>
-  </header>
+  </aside>
 
-  <!-- Intake & Prompt Engineering Panel (Collapsible Drawer / Top Section) -->
-  <section id="intakeDrawer" class="bg-gradient-to-b from-blue-50 to-white border-b border-blue-200 py-6 transition-all duration-300">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <!-- Main Content Stage -->
+  <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+    
+    <!-- Top Bar -->
+    <header class="bg-white border-b border-slate-200 px-6 py-3.5 flex justify-between items-center shrink-0">
+      <div class="flex items-center space-x-3">
+        <span id="currentViewTitle" class="text-sm font-bold text-slate-800">New Clinical Analysis</span>
+        <span id="activeStudyBadge" class="hidden text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+          No Study Loaded
+        </span>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button onclick="exportClinicalReport()" class="px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center">
+          <i data-lucide="printer" class="w-3.5 h-3.5 mr-1.5 text-slate-500"></i> Print Report
+        </button>
+      </div>
+    </header>
+
+    <!-- PAGE 0: Simple Clean Home / Input State (ChatGPT / Gemini Style) -->
+    <div id="page-home" class="page-view flex-1 flex flex-col items-center justify-center p-4 sm:p-8 max-w-3xl mx-auto w-full fade-in">
       
-      <!-- Benchmark / Quick Loaders -->
-      <div class="mb-5 flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-blue-200 shadow-sm">
-        <div class="flex items-center space-x-2">
-          <span class="text-xs font-bold text-blue-950 uppercase tracking-wider flex items-center">
-            <i data-lucide="award" class="w-4 h-4 mr-1 text-cyan-600"></i>
-            Landmark Clinical Trials:
-          </span>
-          <span class="text-xs text-blue-600 font-medium">(1-click load for live evaluation)</span>
+      <div class="text-center mb-6">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-600 text-white flex items-center justify-center mx-auto mb-3 shadow-md">
+          <i data-lucide="sparkles" class="w-7 h-7 text-white"></i>
         </div>
-        <div class="flex flex-wrap gap-2">
-          <button onclick="loadSamplePaper('step-hfpef-2023')" class="px-3 py-1 text-xs font-bold bg-blue-50 hover:bg-cyan-100 text-blue-900 border border-blue-200 rounded-lg shadow-2xs transition">
-            STEP-HFpEF (Semaglutide 2023)
-          </button>
-          <button onclick="loadSamplePaper('dapa-hf-2019')" class="px-3 py-1 text-xs font-bold bg-blue-50 hover:bg-cyan-100 text-blue-900 border border-blue-200 rounded-lg shadow-2xs transition">
-            DAPA-HF (Dapagliflozin 2019)
-          </button>
-          <button onclick="loadSamplePaper('empa-reg-2015')" class="px-3 py-1 text-xs font-bold bg-blue-50 hover:bg-cyan-100 text-blue-900 border border-blue-200 rounded-lg shadow-2xs transition">
-            EMPA-REG OUTCOME (Empagliflozin 2015)
-          </button>
-          <button onclick="loadMultiPaperBenchmark()" class="px-3 py-1 text-xs font-bold bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-500 hover:to-blue-600 text-white rounded-lg shadow transition flex items-center">
-            <i data-lucide="layers" class="w-3.5 h-3.5 mr-1.5"></i> Multi-Paper Consensus Matrix
-          </button>
-        </div>
+        <h2 class="text-2xl font-bold text-slate-900 tracking-tight">What medical paper would you like to synthesize?</h2>
+        <p class="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+          Upload a clinical research PDF, paste an abstract, and get an evidence-grounded summary with dynamic charts and audio briefing.
+        </p>
       </div>
 
-      <!-- Ingestion Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <!-- Main Input Card -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 w-full space-y-4">
         
-        <!-- Left 7 Cols: Document Input -->
-        <div class="lg:col-span-7 space-y-3">
-          <div class="flex justify-between items-center">
-            <label class="block text-xs font-bold text-blue-950 uppercase tracking-wider">
-              1. Document Ingestion (PDF, Text, or PubMed Abstract)
-            </label>
-            <span class="text-xs text-cyan-700 font-semibold">100% Client-Side & HIPAA Safe</span>
-          </div>
-
-          <!-- Tabs: File Upload vs Raw Paste -->
-          <div class="pharma-card p-4">
-            <div class="flex border-b border-blue-100 mb-3 space-x-4">
-              <button id="tabUploadBtn" onclick="switchInputMode('upload')" class="pb-2 text-xs font-bold text-cyan-700 border-b-2 border-cyan-600 flex items-center">
-                <i data-lucide="file-up" class="w-3.5 h-3.5 mr-1.5"></i> Upload Research PDF / TXT
-              </button>
-              <button id="tabPasteBtn" onclick="switchInputMode('paste')" class="pb-2 text-xs font-semibold text-slate-500 hover:text-blue-900 flex items-center">
-                <i data-lucide="clipboard-type" class="w-3.5 h-3.5 mr-1.5"></i> Paste Abstract / Text
-              </button>
-            </div>
-
-            <!-- Upload Area -->
-            <div id="dropZoneArea" class="border-2 border-dashed border-blue-200 hover:border-cyan-500 rounded-xl p-6 text-center cursor-pointer transition bg-blue-50/40">
-              <input type="file" id="fileInput" accept=".pdf,.txt,.md" class="hidden" onchange="handleFileSelected(event)">
-              <div onclick="document.getElementById('fileInput').click()">
-                <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mx-auto mb-2">
-                  <i data-lucide="file-text" class="w-6 h-6"></i>
-                </div>
-                <p class="text-sm font-bold text-blue-950">Drop medical research PDF here, or <span class="text-cyan-600 hover:underline">browse files</span></p>
-                <p class="text-xs text-slate-500 mt-1">Supports Phase 1-4 RCTs, Observational Studies, and Systematic Reviews</p>
-              </div>
-              <div id="selectedFileInfo" class="hidden mt-3 p-2 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-900 flex items-center justify-between">
-                <span id="selectedFileName" class="font-bold truncate max-w-xs"></span>
-                <button onclick="clearSelectedFile(event)" class="text-emerald-900 hover:text-rose-600 ml-2">
-                  <i data-lucide="x" class="w-4 h-4"></i>
-                </button>
-              </div>
-            </div>
-
-            <!-- Paste Area -->
-            <div id="pasteArea" class="hidden">
-              <textarea id="rawPaperText" rows="6" class="w-full text-xs font-mono p-3 border border-blue-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500" placeholder="Paste full PubMed abstract, clinical study text, or trial findings here..."></textarea>
-            </div>
-          </div>
+        <!-- Tabs: Upload PDF vs Paste Text -->
+        <div class="flex border-b border-slate-100 space-x-4 pb-2">
+          <button id="homeTabUploadBtn" onclick="switchInputMode('upload')" class="text-xs font-bold text-blue-600 border-b-2 border-blue-600 pb-1 flex items-center">
+            <i data-lucide="file-up" class="w-3.5 h-3.5 mr-1.5"></i> Upload PDF / Document
+          </button>
+          <button id="homeTabPasteBtn" onclick="switchInputMode('paste')" class="text-xs font-semibold text-slate-400 hover:text-slate-700 pb-1 flex items-center">
+            <i data-lucide="clipboard-type" class="w-3.5 h-3.5 mr-1.5"></i> Paste Abstract / Text
+          </button>
         </div>
 
-        <!-- Right 5 Cols: Custom Clinical Angle & Prompting -->
-        <div class="lg:col-span-5 space-y-3">
-          <div class="flex justify-between items-center">
-            <label class="block text-xs font-bold text-blue-950 uppercase tracking-wider">
-              2. Targeted Clinical Angle (Querying)
-            </label>
-            <span class="text-xs text-cyan-600 font-bold">Custom Focus</span>
+        <!-- Dropzone -->
+        <div id="dropZoneArea" class="border-2 border-dashed border-blue-200 hover:border-blue-500 rounded-xl p-6 text-center cursor-pointer transition bg-blue-50/30">
+          <input type="file" id="fileInput" accept=".pdf,.txt,.md" class="hidden" onchange="handleFileSelected(event)">
+          <div onclick="document.getElementById('fileInput').click()">
+            <i data-lucide="file-plus" class="w-8 h-8 mx-auto text-blue-500 mb-2"></i>
+            <p class="text-sm font-semibold text-slate-800">Drop your research paper PDF here, or <span class="text-blue-600 underline">browse</span></p>
+            <p class="text-xs text-slate-400 mt-0.5">Parsed client-side • Free & unlimited</p>
           </div>
-
-          <div class="pharma-card p-4 space-y-3">
-            <p class="text-xs text-slate-600 leading-relaxed font-medium">
-              Select or type a specialized clinical focus to isolate specific endpoints:
-            </p>
-
-            <!-- Angle Chips -->
-            <div class="flex flex-wrap gap-1.5">
-              <button onclick="setClinicalAngle('Adverse Events & Safety Profile')" class="angle-chip px-2.5 py-1 text-[11px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-full border border-amber-200 transition">
-                Safety & Adverse Events
-              </button>
-              <button onclick="setClinicalAngle('Dosage, Escalation & Pharmacokinetics')" class="angle-chip px-2.5 py-1 text-[11px] font-bold bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-full border border-blue-200 transition">
-                Dosage & Administration
-              </button>
-              <button onclick="setClinicalAngle('Primary Endpoint Hazard Ratios & P-Values')" class="angle-chip px-2.5 py-1 text-[11px] font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-full border border-emerald-200 transition">
-                Statistical Endpoints
-              </button>
-              <button onclick="setClinicalAngle('Geriatric & High-Risk Subpopulations')" class="angle-chip px-2.5 py-1 text-[11px] font-bold bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-full border border-purple-200 transition">
-                Subgroup Demographics
-              </button>
-            </div>
-
-            <!-- Custom Angle Input -->
-            <div>
-              <div class="relative">
-                <input type="text" id="customAngleInput" class="w-full text-xs p-2.5 pl-8 border border-blue-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 bg-slate-50/50" placeholder="Custom clinical query (e.g. 'Compare renal outcomes in patients over 65')...">
-                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-cyan-600 absolute left-2.5 top-3"></i>
-              </div>
-            </div>
-
-            <!-- Execute Analysis Button -->
-            <button onclick="runClinicalSynthesis()" class="w-full py-2.5 px-4 bg-gradient-to-r from-blue-700 to-cyan-600 hover:from-blue-600 hover:to-cyan-500 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center space-x-2">
-              <i data-lucide="activity" class="w-4 h-4 text-cyan-200"></i>
-              <span>Synthesize Clinical Evidence & Grounding</span>
+          <div id="selectedFileInfo" class="hidden mt-3 p-2 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-800 flex items-center justify-between">
+            <span id="selectedFileName" class="font-bold truncate max-w-xs"></span>
+            <button onclick="clearSelectedFile(event)" class="text-emerald-900 hover:text-rose-600 ml-2">
+              <i data-lucide="x" class="w-4 h-4"></i>
             </button>
           </div>
         </div>
 
-      </div>
-    </div>
-  </section>
+        <!-- Paste Text Area -->
+        <div id="pasteArea" class="hidden">
+          <textarea id="rawPaperText" rows="5" class="w-full text-xs font-mono p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500" placeholder="Paste study abstract, clinical trial text, or methodology here..."></textarea>
+        </div>
 
-  <!-- Main Clinical Workbench Content Area -->
-  <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
-    
-    <!-- Active Study Header Banner -->
-    <div id="studyHeaderBanner" class="pharma-card p-5 mb-6 border-l-8 border-l-cyan-600">
-      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <!-- Optional Prompt Box (ChatGPT / Gemini style) -->
         <div>
-          <div class="flex flex-wrap items-center gap-2 mb-2">
-            <span id="studyTypeBadge" class="pharma-pill pill-cyan">
-              Phase 3 Randomized Controlled Trial
-            </span>
-            <span id="studyJournalBadge" class="pharma-pill pill-emerald">
-              NEJM 2023
-            </span>
-            <span id="studySampleSizeBadge" class="pharma-pill pill-amber">
-              N = 529 Enrolled
-            </span>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">
+            Optional Clinical Prompt / Angle
+          </label>
+          <div class="relative">
+            <input type="text" id="customAngleInput" class="w-full text-xs p-3 pl-9 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500" placeholder="e.g. 'Focus on adverse events in elderly', 'Extract dosage schedule', or leave blank for full summary...">
+            <i data-lucide="message-circle" class="w-4 h-4 text-slate-400 absolute left-3 top-3.5"></i>
           </div>
-          <h2 id="studyTitleHeading" class="text-lg sm:text-xl font-bold font-clinical-serif text-blue-950">
-            Semaglutide in Patients with Heart Failure with Preserved Ejection Fraction and Obesity
-          </h2>
-          <p id="studyAuthorsP" class="text-xs text-slate-500 mt-1 font-medium">
-            Kosiborod MN, Abildstrøm SZ, Borlaug BA, et al. | DOI: 10.1056/NEJMoa2306963 | PMID: 37622681
-          </p>
         </div>
 
-        <!-- Clinical Quality & Faithfulness Score Meter -->
-        <div class="flex items-center space-x-4 bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 p-3 rounded-xl shrink-0 shadow-2xs">
-          <div class="text-center">
-            <div class="text-xl font-black text-cyan-700" id="groundingScoreValue">99.4%</div>
-            <div class="text-[10px] uppercase font-bold tracking-wider text-slate-500">Grounding Fidelity</div>
-          </div>
-          <div class="w-px h-8 bg-blue-200"></div>
-          <div class="text-center">
-            <div class="text-xl font-black text-blue-950" id="qualityScoreValue">98/100</div>
-            <div class="text-[10px] uppercase font-bold tracking-wider text-slate-500">Evidence Rigor</div>
-          </div>
-          <div class="w-px h-8 bg-blue-200"></div>
-          <div class="text-center">
-            <div class="text-xs font-bold text-emerald-700 flex items-center justify-center">
-              <i data-lucide="check-circle-2" class="w-3.5 h-3.5 mr-1 text-emerald-600"></i> Low
-            </div>
-            <div class="text-[10px] uppercase font-bold tracking-wider text-slate-500">Risk of Bias</div>
-          </div>
+        <!-- Quick Prompt Chips -->
+        <div class="flex flex-wrap gap-1.5 pt-1">
+          <span class="text-[11px] text-slate-400 self-center mr-1">Suggested angles:</span>
+          <button onclick="setClinicalAngle('Adverse Events & Safety Profile')" class="px-2.5 py-0.5 text-[11px] rounded-full bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-700 transition">
+            Safety & Tolerability
+          </button>
+          <button onclick="setClinicalAngle('Primary Endpoint Hazard Ratios & P-Values')" class="px-2.5 py-0.5 text-[11px] rounded-full bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-700 transition">
+            Primary Statistics
+          </button>
+          <button onclick="setClinicalAngle('Dosage, Escalation & Pharmacokinetics')" class="px-2.5 py-0.5 text-[11px] rounded-full bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-700 transition">
+            Dosage Schedule
+          </button>
         </div>
+
+        <!-- Submit Button -->
+        <button onclick="runClinicalSynthesis()" class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center space-x-2">
+          <i data-lucide="zap" class="w-4 h-4"></i>
+          <span>Synthesize Clinical Evidence</span>
+        </button>
       </div>
+
     </div>
 
-    <!-- Workbench Tabbed Navigation -->
-    <div class="border-b-2 border-blue-200 mb-6">
-      <nav class="flex space-x-6 overflow-x-auto" aria-label="Tabs">
-        <button onclick="switchWorkbenchTab('summary')" id="tabBtnSummary" class="workbench-tab active pb-3 text-sm font-bold text-cyan-700 border-b-2 border-cyan-600 flex items-center whitespace-nowrap">
-          <i data-lucide="file-check-2" class="w-4 h-4 mr-2"></i>
-          Structured Clinical Synthesis
-        </button>
-        <button onclick="switchWorkbenchTab('grounding')" id="tabBtnGrounding" class="workbench-tab pb-3 text-sm font-semibold text-slate-500 hover:text-blue-900 flex items-center whitespace-nowrap">
-          <i data-lucide="split" class="w-4 h-4 mr-2"></i>
-          Evidence Grounding & Source Inspector
-        </button>
-        <button onclick="switchWorkbenchTab('matrix')" id="tabBtnMatrix" class="workbench-tab pb-3 text-sm font-semibold text-slate-500 hover:text-blue-900 flex items-center whitespace-nowrap">
-          <i data-lucide="scale" class="w-4 h-4 mr-2"></i>
-          Multi-Paper Contradiction & Consensus Matrix
-        </button>
-        <button onclick="switchWorkbenchTab('metrics')" id="tabBtnMetrics" class="workbench-tab pb-3 text-sm font-semibold text-slate-500 hover:text-blue-900 flex items-center whitespace-nowrap">
-          <i data-lucide="bar-chart-3" class="w-4 h-4 mr-2"></i>
-          Quantitative Endpoints & Charts
-        </button>
-        <button onclick="switchWorkbenchTab('audio')" id="tabBtnAudio" class="workbench-tab pb-3 text-sm font-semibold text-slate-500 hover:text-blue-900 flex items-center whitespace-nowrap">
-          <i data-lucide="headphones" class="w-4 h-4 mr-2"></i>
-          30-Second Audio Briefing ("Podcast Mode")
-        </button>
-      </nav>
-    </div>
-
-    <!-- TAB 1: Structured Clinical Synthesis -->
-    <div id="tabContentSummary" class="tab-pane space-y-6">
+    <!-- PAGE 1: Structured Clinical Summary -->
+    <div id="page-summary" class="page-view hidden flex-1 p-6 max-w-5xl mx-auto w-full fade-in space-y-6">
       
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <!-- Top Study Header -->
+      <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center space-x-2 mb-1.5">
+              <span id="summaryPhaseBadge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">Phase 3 RCT</span>
+              <span id="summaryJournalBadge" class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">NEJM 2023</span>
+              <span id="summarySampleBadge" class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-700">N = 529</span>
+            </div>
+            <h2 id="studyTitleHeading" class="text-lg font-bold text-slate-900">Study Title</h2>
+            <p id="studyAuthorsP" class="text-xs text-slate-500 mt-0.5">Authors & Citations</p>
+          </div>
+          <!-- Faithfulness Gauge -->
+          <div class="text-center bg-blue-50 border border-blue-200 p-3 rounded-xl shrink-0">
+            <div class="text-xl font-black text-blue-700" id="groundingScoreValue">99.4%</div>
+            <div class="text-[10px] uppercase font-bold text-slate-500">Evidence Fidelity</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Clinical Breakdown Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         
-        <!-- Left 8 Cols: Clinical Breakdown -->
-        <div class="lg:col-span-8 space-y-5">
-          
-          <!-- Objective & Trial Design -->
-          <div class="pharma-card card-objective p-5">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-cyan-800 mb-2 flex items-center">
-              <i data-lucide="target" class="w-4 h-4 mr-1.5 text-cyan-600"></i>
-              Clinical Objective & Target Population
-            </h3>
-            <p id="summaryObjective" class="text-sm text-slate-900 leading-relaxed font-clinical-serif">
-              Evaluating therapeutic efficacy and safety parameters.
-            </p>
-
-            <div class="mt-4 pt-3 border-t border-blue-100">
-              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5 flex items-center">
-                <i data-lucide="flask-conical" class="w-3.5 h-3.5 mr-1.5 text-blue-600"></i>
-                Methodology & Trial Protocol
-              </h4>
-              <p id="summaryMethodology" class="text-xs text-slate-700 leading-relaxed font-medium">
-                Standard double-blind clinical methodology.
-              </p>
-            </div>
-          </div>
-
-          <!-- Key Quantitative Findings (with Grounding Citation Badges) -->
-          <div class="pharma-card card-findings p-5">
-            <div class="flex justify-between items-center mb-3">
-              <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-800 flex items-center">
-                <i data-lucide="check-circle" class="w-4 h-4 mr-1.5 text-emerald-600"></i>
-                Key Quantitative Findings & Primary Endpoints
-              </h3>
-              <span class="text-[11px] text-emerald-800 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                Click [Ref #] to verify source
-              </span>
-            </div>
-
-            <div id="keyFindingsList" class="space-y-3">
-              <!-- Dynamically populated key findings with [Ref 1], [Ref 2] -->
-            </div>
-          </div>
-
-          <!-- Safety Profile & Adverse Events -->
-          <div class="pharma-card card-safety p-5">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-amber-800 mb-2 flex items-center">
-              <i data-lucide="alert-triangle" class="w-4 h-4 mr-1.5 text-amber-600"></i>
-              Safety Profile & Treatment-Emergent Adverse Events
-            </h3>
-            <p id="summarySafety" class="text-xs text-slate-800 leading-relaxed bg-amber-50 p-3 rounded-lg border border-amber-200">
-              Adverse event analysis...
-            </p>
-          </div>
-
+        <!-- Objective -->
+        <div class="bg-white rounded-xl border border-blue-200 p-5 shadow-sm">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-blue-700 mb-2 flex items-center">
+            <i data-lucide="target" class="w-4 h-4 mr-1.5 text-blue-600"></i> Objective & Population
+          </h3>
+          <p id="summaryObjective" class="text-xs text-slate-700 leading-relaxed"></p>
         </div>
 
-        <!-- Right 4 Cols: Clinical Bottom-Line, Actions & Summary Quality -->
-        <div class="lg:col-span-4 space-y-5">
-          
-          <!-- Clinical Bottom-Line Card -->
-          <div class="pharma-card card-takeaway p-5 shadow-lg">
-            <div class="flex items-center space-x-2 text-cyan-300 mb-2 text-xs font-bold uppercase tracking-wider">
-              <i data-lucide="stethoscope" class="w-4 h-4"></i>
-              <span>Clinical Takeaway</span>
-            </div>
-            <p id="summaryBottomLine" class="text-sm text-cyan-50 leading-relaxed font-clinical-serif">
-              Clinical recommendation summary.
-            </p>
-            <div class="mt-4 pt-3 border-t border-cyan-900/60 flex items-center justify-between text-xs text-cyan-200">
-              <span>Recommendation Strength:</span>
-              <span class="font-bold text-cyan-300 bg-cyan-900/80 px-2 py-0.5 rounded">Class 1 (Strong)</span>
-            </div>
-          </div>
-
-          <!-- Quick Audio Briefing Mini Player -->
-          <div class="pharma-card p-4">
-            <div class="flex items-center justify-between mb-3">
-              <span class="text-xs font-bold uppercase tracking-wider text-blue-950 flex items-center">
-                <i data-lucide="volume-2" class="w-4 h-4 mr-1.5 text-cyan-600"></i>
-                Clinical Briefing Audio
-              </span>
-              <span class="text-[10px] font-bold text-cyan-800 bg-cyan-50 px-2 py-0.5 rounded">~30 sec review</span>
-            </div>
-            
-            <div class="flex items-center space-x-3 mb-2">
-              <button id="miniPlayBtn" onclick="toggleAudioBriefing()" class="w-10 h-10 rounded-full bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-500 hover:to-blue-600 text-white flex items-center justify-center transition shadow-md">
-                <i id="miniPlayIcon" data-lucide="play" class="w-4 h-4 fill-white"></i>
-              </button>
-              <div class="flex-1">
-                <div class="flex justify-between text-[11px] text-slate-600 mb-1 font-medium">
-                  <span id="audioTimer">0:00 / 0:32</span>
-                  <span class="text-cyan-700 font-bold">Web Speech Engine</span>
-                </div>
-                <div class="w-full bg-blue-100 rounded-full h-2 overflow-hidden">
-                  <div id="audioProgressBar" class="bg-gradient-to-r from-cyan-500 to-blue-600 h-2 w-0 rounded-full transition-all duration-200"></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Waveform bars -->
-            <div class="flex items-center justify-center py-1">
-              <span class="wave-bar"></span>
-              <span class="wave-bar"></span>
-              <span class="wave-bar"></span>
-              <span class="wave-bar"></span>
-              <span class="wave-bar"></span>
-              <span class="wave-bar"></span>
-              <span class="wave-bar"></span>
-              <span class="wave-bar"></span>
-            </div>
-          </div>
-
-          <!-- Grounding Verification Summary Box -->
-          <div class="pharma-card p-4 text-xs space-y-2.5">
-            <div class="font-bold text-blue-950 uppercase tracking-wider text-[11px] flex items-center">
-              <i data-lucide="file-badge" class="w-3.5 h-3.5 mr-1.5 text-cyan-600"></i>
-              Zero-Hallucination Integrity Checklist
-            </div>
-            <div class="flex items-center justify-between py-1 border-b border-blue-50">
-              <span class="text-slate-600">Sentence-Claim Mapping:</span>
-              <span class="font-bold text-emerald-700">100% Grounded</span>
-            </div>
-            <div class="flex items-center justify-between py-1 border-b border-blue-50">
-              <span class="text-slate-600">Statistical Boundary Check:</span>
-              <span class="font-bold text-emerald-700">Verified Significant</span>
-            </div>
-            <div class="flex items-center justify-between py-1 border-b border-blue-50">
-              <span class="text-slate-600">Sample Population $N$:</span>
-              <span id="checklistN" class="font-bold text-blue-950">529 Subjects</span>
-            </div>
-            <div class="flex items-center justify-between pt-1">
-              <span class="text-slate-600">Deployment Status:</span>
-              <span class="font-bold text-cyan-700">Vercel Ready</span>
-            </div>
-          </div>
-
+        <!-- Methodology -->
+        <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2 flex items-center">
+            <i data-lucide="flask-conical" class="w-4 h-4 mr-1.5 text-slate-600"></i> Trial Protocol & Design
+          </h3>
+          <p id="summaryMethodology" class="text-xs text-slate-700 leading-relaxed"></p>
         </div>
 
       </div>
 
+      <!-- Key Findings -->
+      <div class="bg-white rounded-xl border border-emerald-200 p-5 shadow-sm">
+        <div class="flex justify-between items-center mb-3">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-800 flex items-center">
+            <i data-lucide="check-circle" class="w-4 h-4 mr-1.5 text-emerald-600"></i> Key Quantitative Findings
+          </h3>
+          <span class="text-[11px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded">Click [Ref #] to view source sentence</span>
+        </div>
+        <div id="keyFindingsList" class="space-y-3"></div>
+      </div>
+
+      <!-- Safety & Bottom Line -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div class="bg-amber-50/60 rounded-xl border border-amber-200 p-5 shadow-sm">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-amber-800 mb-2 flex items-center">
+            <i data-lucide="alert-triangle" class="w-4 h-4 mr-1.5 text-amber-600"></i> Safety & Adverse Events
+          </h3>
+          <p id="summarySafety" class="text-xs text-slate-800 leading-relaxed"></p>
+        </div>
+
+        <div class="bg-slate-900 text-white rounded-xl p-5 shadow-md">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-cyan-400 mb-2 flex items-center">
+            <i data-lucide="stethoscope" class="w-4 h-4 mr-1.5"></i> Clinical Recommendation
+          </h3>
+          <p id="summaryBottomLine" class="text-xs text-slate-200 leading-relaxed"></p>
+        </div>
+      </div>
+
     </div>
 
-    <!-- TAB 2: Evidence Grounding Split-View Inspector -->
-    <div id="tabContentGrounding" class="tab-pane hidden space-y-4">
-      <div class="pharma-card p-4 flex items-center justify-between">
+    <!-- PAGE 2: Evidence Grounding Split-View Inspector -->
+    <div id="page-grounding" class="page-view hidden flex-1 p-6 max-w-6xl mx-auto w-full fade-in space-y-4">
+      <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex items-center justify-between">
         <div>
-          <h3 class="text-sm font-bold text-blue-950 flex items-center">
-            <i data-lucide="shield-check" class="w-4 h-4 mr-2 text-cyan-600"></i>
-            Dual-Pane Evidence Grounding & Source Sentence Verifier
+          <h3 class="text-sm font-bold text-slate-900 flex items-center">
+            <i data-lucide="shield-check" class="w-4 h-4 mr-2 text-blue-600"></i> Evidence Grounding & Source Sentence Verifier
           </h3>
-          <p class="text-xs text-slate-600 mt-0.5 font-medium">
-            Every clinical claim is linked to an exact sentence in the original document. Click any claim on the left to highlight its source sentence on the right.
-          </p>
+          <p class="text-xs text-slate-500 mt-0.5">Click any claim on the left to highlight and verify its source sentence on the right.</p>
         </div>
-        <button onclick="clearInspectorHighlights()" class="text-xs font-bold text-blue-900 hover:text-cyan-700 border border-blue-200 px-3 py-1.5 rounded-lg bg-blue-50 shadow-2xs">
+        <button onclick="clearInspectorHighlights()" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700">
           Reset Highlights
         </button>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        <!-- Left 6 Cols: Summarized Clinical Claims -->
-        <div class="lg:col-span-6 pharma-card p-4 flex flex-col h-[650px]">
-          <div class="pb-3 border-b border-blue-100 font-bold text-xs uppercase text-blue-950 flex justify-between items-center">
-            <span>Synthesized Clinical Claims</span>
-            <span class="text-[11px] text-cyan-700 font-bold">Click claim to trace</span>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 h-[650px]">
+        <!-- Left: Claims -->
+        <div class="lg:col-span-6 bg-white rounded-xl border border-slate-200 p-4 flex flex-col shadow-sm">
+          <div class="pb-2 mb-2 border-b border-slate-100 font-bold text-xs uppercase text-slate-700 flex justify-between">
+            <span>Clinical Claims</span>
+            <span class="text-[11px] text-blue-600 font-normal">Click to trace</span>
           </div>
-          <div id="groundingClaimsList" class="flex-1 overflow-y-auto divide-y divide-blue-50 pr-2 pt-2 space-y-2">
-            <!-- Populated via JS -->
-          </div>
+          <div id="groundingClaimsList" class="flex-1 overflow-y-auto space-y-2 pr-1"></div>
         </div>
 
-        <!-- Right 6 Cols: Original Paper Source Viewer with Indexed Sentences -->
-        <div class="lg:col-span-6 pharma-card p-4 flex flex-col h-[650px] bg-blue-50/20">
-          <div class="pb-3 border-b border-blue-100 font-bold text-xs uppercase text-blue-950 flex justify-between items-center">
-            <span>Original Paper Source Inspection</span>
-            <span id="sourceSentenceCountBadge" class="text-[11px] text-slate-500 font-semibold">10 Sentences Indexed</span>
+        <!-- Right: Source Viewer -->
+        <div class="lg:col-span-6 bg-white rounded-xl border border-slate-200 p-4 flex flex-col shadow-sm font-mono text-xs">
+          <div class="pb-2 mb-2 border-b border-slate-100 font-bold text-xs uppercase text-slate-700 flex justify-between font-sans">
+            <span>Original Source Text</span>
+            <span id="sourceSentenceCountBadge" class="text-[11px] text-slate-400 font-normal">0 Sentences</span>
           </div>
-          <div id="sourceSentenceViewer" class="flex-1 overflow-y-auto text-xs text-slate-700 pr-2 pt-2 space-y-1 font-mono leading-relaxed">
-            <!-- Populated via JS with indexed sentence spans -->
-          </div>
+          <div id="sourceSentenceViewer" class="flex-1 overflow-y-auto space-y-1 pr-1 text-slate-700 leading-relaxed"></div>
         </div>
-
       </div>
     </div>
 
-    <!-- TAB 3: Multi-Paper Contradiction & Consensus Matrix -->
-    <div id="tabContentMatrix" class="tab-pane hidden space-y-6">
+    <!-- PAGE 3: Contradiction & Consensus Matrix -->
+    <div id="page-matrix" class="page-view hidden flex-1 p-6 max-w-5xl mx-auto w-full fade-in space-y-6">
       
-      <div class="pharma-card p-5">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-blue-100 gap-3">
-          <div>
-            <h3 class="text-base font-bold text-blue-950 flex items-center">
-              <i data-lucide="scale" class="w-5 h-5 mr-2 text-cyan-600"></i>
-              Cross-Study Contradiction & Consensus Synthesis Matrix
-            </h3>
-            <p class="text-xs text-slate-600 mt-1 font-medium">
-              Automated systematic cross-comparison identifying clinical agreement, conflicting endpoints, and safety divergences across independent trials.
-            </p>
-          </div>
-          <div class="flex items-center space-x-2">
-            <span class="text-xs font-bold text-blue-950">Studies In Matrix:</span>
-            <span id="matrixStudyCountBadge" class="pharma-pill pill-cyan">
-              3 Landmark Trials
-            </span>
-          </div>
-        </div>
-
-        <!-- Compared Studies Chips -->
-        <div id="matrixStudiesChips" class="flex flex-wrap gap-2 pt-4 pb-2">
-          <!-- Chips -->
-        </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <h3 class="text-base font-bold text-slate-900 flex items-center mb-1">
+          <i data-lucide="scale" class="w-5 h-5 mr-2 text-purple-600"></i> Multi-Paper Contradiction & Consensus Matrix
+        </h3>
+        <p class="text-xs text-slate-500 mb-3">Side-by-side synthesis across independent clinical trials.</p>
+        <div id="matrixStudiesChips" class="flex flex-wrap gap-2"></div>
       </div>
 
-      <!-- Section A: Clinical Consensus Points (Where trials agree) -->
-      <div class="pharma-card overflow-hidden">
-        <div class="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-200 px-5 py-3 flex items-center justify-between">
-          <div class="flex items-center space-x-2">
-            <span class="w-3 h-3 rounded-full bg-emerald-500 shadow-sm"></span>
-            <h4 class="text-xs font-bold text-emerald-950 uppercase tracking-wider">
-              1. Consensus Points (Cross-Study Concordance)
-            </h4>
-          </div>
-          <span class="text-[11px] font-bold text-emerald-800 bg-white px-2.5 py-0.5 rounded-full border border-emerald-200 shadow-2xs">
-            Validated Concordance
-          </span>
+      <!-- Consensus -->
+      <div class="bg-white rounded-xl border border-emerald-200 overflow-hidden shadow-sm">
+        <div class="bg-emerald-50 px-5 py-3 border-b border-emerald-100 flex items-center justify-between">
+          <span class="text-xs font-bold text-emerald-950 uppercase">1. Consensus Points (Where Trials Agree)</span>
+          <span class="text-[10px] font-bold text-emerald-800 bg-white px-2 py-0.5 rounded border border-emerald-200">Concordance</span>
         </div>
-        <div id="consensusList" class="divide-y divide-blue-50 p-5 space-y-4">
-          <!-- Populated by JS -->
-        </div>
+        <div id="consensusList" class="p-5 divide-y divide-slate-100 space-y-3"></div>
       </div>
 
-      <!-- Section B: Clinical Contradictions & Divergences (Where findings conflict) -->
-      <div class="pharma-card overflow-hidden">
-        <div class="bg-gradient-to-r from-rose-50 to-orange-50 border-b border-rose-200 px-5 py-3 flex items-center justify-between">
-          <div class="flex items-center space-x-2">
-            <span class="w-3 h-3 rounded-full bg-rose-500 shadow-sm"></span>
-            <h4 class="text-xs font-bold text-rose-950 uppercase tracking-wider">
-              2. Clinical Contradictions & Safety Divergences
-            </h4>
-          </div>
-          <span class="text-[11px] font-bold text-rose-800 bg-white px-2.5 py-0.5 rounded-full border border-rose-200 shadow-2xs">
-            Discrepancies Flagged
-          </span>
+      <!-- Contradictions -->
+      <div class="bg-white rounded-xl border border-rose-200 overflow-hidden shadow-sm">
+        <div class="bg-rose-50 px-5 py-3 border-b border-rose-100 flex items-center justify-between">
+          <span class="text-xs font-bold text-rose-950 uppercase">2. Contradictions & Divergences (Where Findings Conflict)</span>
+          <span class="text-[10px] font-bold text-rose-800 bg-white px-2 py-0.5 rounded border border-rose-200">Discrepancies</span>
         </div>
-        <div id="contradictionsList" class="divide-y divide-blue-50 p-5 space-y-4">
-          <!-- Populated by JS -->
-        </div>
+        <div id="contradictionsList" class="p-5 divide-y divide-slate-100 space-y-3"></div>
       </div>
 
     </div>
 
-    <!-- TAB 4: Quantitative Visualizer (Dynamic Charts) -->
-    <div id="tabContentMetrics" class="tab-pane hidden space-y-6">
-      
-      <div class="pharma-card p-5">
-        <div class="flex items-center justify-between pb-3 border-b border-blue-100">
-          <div>
-            <h3 class="text-sm font-bold text-blue-950 flex items-center">
-              <i data-lucide="bar-chart-2" class="w-4 h-4 mr-2 text-cyan-600"></i>
-              Dynamic Quantitative Endpoint Analytics
-            </h3>
-            <p class="text-xs text-slate-600 mt-0.5 font-medium">
-              Numerical metrics automatically parsed from clinical texts, rendered into responsive comparison charts.
-            </p>
-          </div>
-          <span class="pharma-pill pill-cyan">Chart.js Engine</span>
-        </div>
+    <!-- PAGE 4: Dynamic Charts -->
+    <div id="page-charts" class="page-view hidden flex-1 p-6 max-w-5xl mx-auto w-full fade-in space-y-6">
+      <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <h3 class="text-base font-bold text-slate-900 flex items-center mb-1">
+          <i data-lucide="bar-chart-2" class="w-5 h-5 mr-2 text-blue-600"></i> Quantitative Endpoint Visualizer
+        </h3>
+        <p class="text-xs text-slate-500 mb-4">Dynamically extracted trial numbers rendered into comparative charts.</p>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-5">
-          
-          <!-- Chart 1: Primary Efficacy Endpoint Comparison -->
-          <div class="border border-blue-200 rounded-xl p-4 bg-gradient-to-b from-blue-50/40 to-white shadow-2xs">
-            <h4 class="text-xs font-bold text-blue-950 uppercase tracking-wider mb-3 flex items-center">
-              <i data-lucide="activity" class="w-3.5 h-3.5 mr-1.5 text-cyan-600"></i>
-              Efficacy Endpoint / Score Delta
-            </h4>
-            <div class="h-64 flex items-center justify-center">
-              <canvas id="efficacyChart"></canvas>
-            </div>
-            <p class="text-[11px] text-slate-500 text-center mt-2 font-medium">Active Intervention vs Placebo/Control</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="p-4 border border-slate-100 rounded-xl bg-slate-50/50">
+            <h4 class="text-xs font-bold text-slate-700 uppercase mb-2">Primary Efficacy Score Delta</h4>
+            <div class="h-64"><canvas id="efficacyChart"></canvas></div>
           </div>
-
-          <!-- Chart 2: Serious Adverse Event Rates -->
-          <div class="border border-rose-200 rounded-xl p-4 bg-gradient-to-b from-rose-50/30 to-white shadow-2xs">
-            <h4 class="text-xs font-bold text-rose-950 uppercase tracking-wider mb-3 flex items-center">
-              <i data-lucide="alert-circle" class="w-3.5 h-3.5 mr-1.5 text-rose-600"></i>
-              Adverse Event & Discontinuation Incidence (%)
-            </h4>
-            <div class="h-64 flex items-center justify-center">
-              <canvas id="adverseChart"></canvas>
-            </div>
-            <p class="text-[11px] text-slate-500 text-center mt-2 font-medium">Safety Comparison Across Trial Cohorts</p>
+          <div class="p-4 border border-slate-100 rounded-xl bg-slate-50/50">
+            <h4 class="text-xs font-bold text-slate-700 uppercase mb-2">Adverse Event Rates (%)</h4>
+            <div class="h-64"><canvas id="adverseChart"></canvas></div>
           </div>
-
         </div>
       </div>
-
     </div>
 
-    <!-- TAB 5: 30-Second Audio Briefing ("Podcast Mode") -->
-    <div id="tabContentAudio" class="tab-pane hidden space-y-6">
-      
-      <div class="pharma-card p-6 max-w-3xl mx-auto">
-        <div class="text-center mb-6">
-          <div class="w-14 h-14 bg-gradient-to-tr from-cyan-500 to-blue-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
-            <i data-lucide="headphones" class="w-7 h-7 text-white"></i>
+    <!-- PAGE 5: Audio Briefing ("Podcast Mode") -->
+    <div id="page-audio" class="page-view hidden flex-1 p-6 max-w-2xl mx-auto w-full fade-in space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm text-center">
+        <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
+          <i data-lucide="headphones" class="w-6 h-6"></i>
+        </div>
+        <h3 class="text-lg font-bold text-slate-900">30-Second Audio Briefing ("Podcast Mode")</h3>
+        <p class="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+          Synthesized clinical audio summary using native browser speech synthesis. Hands-free and 100% free.
+        </p>
+
+        <!-- Player -->
+        <div class="bg-slate-900 text-white rounded-xl p-6 mt-6 shadow-md space-y-4">
+          <div class="flex items-center justify-between text-xs text-cyan-400">
+            <span class="flex items-center"><i data-lucide="radio" class="w-3.5 h-3.5 mr-1.5 animate-pulse"></i> NARRATION</span>
+            <span id="audioStatusBadge" class="text-[11px] text-slate-400">Ready</span>
           </div>
-          <h3 class="text-lg font-bold text-blue-950">Clinical Audio Briefing ("Podcast Mode")</h3>
-          <p class="text-xs text-slate-600 mt-1 max-w-md mx-auto font-medium">
-            Hands-free, 30-second synthesized executive clinical audio designed for physicians and researchers reviewing literature on the move.
+
+          <!-- Controls -->
+          <div class="flex items-center justify-center space-x-6 py-2">
+            <button onclick="skipAudio(-10)" class="text-slate-400 hover:text-white"><i data-lucide="rotate-ccw" class="w-5 h-5"></i></button>
+            <button onclick="toggleAudioBriefing()" class="w-12 h-12 rounded-full bg-blue-500 hover:bg-blue-400 text-white flex items-center justify-center shadow">
+              <i id="mainPlayIcon" data-lucide="play" class="w-5 h-5 fill-white ml-0.5"></i>
+            </button>
+            <button onclick="skipAudio(10)" class="text-slate-400 hover:text-white"><i data-lucide="rotate-cw" class="w-5 h-5"></i></button>
+          </div>
+
+          <!-- Speeds -->
+          <div class="flex justify-center space-x-2 text-xs">
+            <button onclick="setPlaybackSpeed(1.0)" id="speedBtn1" class="px-2.5 py-0.5 rounded font-bold bg-blue-600 text-white">1.0x</button>
+            <button onclick="setPlaybackSpeed(1.25)" id="speedBtn125" class="px-2.5 py-0.5 rounded text-slate-400 hover:text-white">1.25x</button>
+            <button onclick="setPlaybackSpeed(1.5)" id="speedBtn15" class="px-2.5 py-0.5 rounded text-slate-400 hover:text-white">1.5x</button>
+          </div>
+
+          <!-- Waves -->
+          <div class="flex justify-center py-1">
+            <span class="wave-bar"></span>
+            <span class="wave-bar"></span>
+            <span class="wave-bar"></span>
+            <span class="wave-bar"></span>
+            <span class="wave-bar"></span>
+            <span class="wave-bar"></span>
+          </div>
+
+          <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+            <div id="mainAudioProgressBar" class="bg-cyan-400 h-1.5 w-0 rounded-full transition-all duration-200"></div>
+          </div>
+        </div>
+
+        <!-- Transcript -->
+        <div class="mt-5 p-4 rounded-xl bg-slate-50 border border-slate-200 text-left">
+          <h4 class="text-xs font-bold text-slate-700 uppercase mb-1">Narration Transcript</h4>
+          <p id="audioScriptText" class="text-xs text-slate-600 leading-relaxed italic">
+            Narration script will generate when a study is synthesized.
           </p>
         </div>
-
-        <!-- Audio Player Console -->
-        <div class="bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white rounded-2xl p-6 shadow-xl border border-cyan-500/20 mb-6">
-          <div class="flex items-center justify-between text-xs text-cyan-300 font-bold mb-4">
-            <span class="flex items-center">
-              <i data-lucide="radio" class="w-3.5 h-3.5 mr-1.5 text-cyan-400 animate-pulse"></i>
-              PAPERLENS NARRATION BROADCAST
-            </span>
-            <span id="audioStatusBadge" class="bg-blue-900/80 px-2.5 py-0.5 rounded-full text-[11px] text-cyan-200 border border-cyan-400/30">Ready to Stream</span>
-          </div>
-
-          <!-- Central Controls -->
-          <div class="flex flex-col items-center space-y-4">
-            <div class="flex items-center space-x-6">
-              <button onclick="skipAudio(-10)" class="text-cyan-200 hover:text-white transition">
-                <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
-              </button>
-              <button id="mainPlayBtn" onclick="toggleAudioBriefing()" class="w-14 h-14 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-slate-950 flex items-center justify-center transition shadow-lg transform active:scale-95">
-                <i id="mainPlayIcon" data-lucide="play" class="w-6 h-6 fill-slate-950 ml-0.5"></i>
-              </button>
-              <button onclick="skipAudio(10)" class="text-cyan-200 hover:text-white transition">
-                <i data-lucide="rotate-cw" class="w-5 h-5"></i>
-              </button>
-            </div>
-
-            <!-- Playback Speed Controls -->
-            <div class="flex items-center space-x-2 text-xs">
-              <span class="text-cyan-200 text-[11px] font-medium">Speed:</span>
-              <button onclick="setPlaybackSpeed(1.0)" id="speedBtn1" class="px-2.5 py-0.5 rounded-full font-bold bg-cyan-500 text-slate-950">1.0x</button>
-              <button onclick="setPlaybackSpeed(1.25)" id="speedBtn125" class="px-2.5 py-0.5 rounded-full font-semibold bg-blue-950 text-cyan-200 hover:bg-blue-900 border border-cyan-500/20">1.25x</button>
-              <button onclick="setPlaybackSpeed(1.5)" id="speedBtn15" class="px-2.5 py-0.5 rounded-full font-semibold bg-blue-950 text-cyan-200 hover:bg-blue-900 border border-cyan-500/20">1.5x</button>
-            </div>
-          </div>
-
-          <!-- Waveform visualizer container -->
-          <div class="flex items-center justify-center space-x-1.5 py-4 mt-2">
-            <span class="wave-bar h-2"></span>
-            <span class="wave-bar h-4"></span>
-            <span class="wave-bar h-6"></span>
-            <span class="wave-bar h-8"></span>
-            <span class="wave-bar h-10"></span>
-            <span class="wave-bar h-7"></span>
-            <span class="wave-bar h-5"></span>
-            <span class="wave-bar h-3"></span>
-            <span class="wave-bar h-6"></span>
-            <span class="wave-bar h-8"></span>
-            <span class="wave-bar h-4"></span>
-          </div>
-
-          <div class="w-full bg-blue-950 rounded-full h-2 overflow-hidden mt-2 border border-blue-900">
-            <div id="mainAudioProgressBar" class="bg-gradient-to-r from-cyan-400 to-blue-400 h-2 w-0 rounded-full transition-all duration-200"></div>
-          </div>
-        </div>
-
-        <!-- Spoken Audio Script Transcript -->
-        <div class="border border-blue-200 rounded-xl p-4 bg-blue-50/40">
-          <h4 class="text-xs font-bold text-blue-950 uppercase tracking-wider mb-2 flex items-center">
-            <i data-lucide="file-text" class="w-3.5 h-3.5 mr-1.5 text-cyan-600"></i>
-            Audio Narration Script
-          </h4>
-          <p id="audioScriptText" class="text-xs text-slate-700 leading-relaxed font-clinical-serif italic">
-            Narration script will generate automatically when study is loaded.
-          </p>
-        </div>
-
       </div>
-
     </div>
 
   </main>
 
-  <!-- Settings & Free API Modal -->
+  <!-- Settings Modal -->
   <div id="settingsModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="pharma-card max-w-md w-full p-6 shadow-2xl animate-in fade-in zoom-in duration-150">
-      <div class="flex justify-between items-center pb-3 border-b border-blue-100">
-        <h3 class="text-sm font-bold text-blue-950 flex items-center">
-          <i data-lucide="key" class="w-4 h-4 mr-2 text-cyan-600"></i>
-          AI Engine & Free Gemini API Setup
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4">
+      <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+        <h3 class="text-sm font-bold text-slate-900 flex items-center">
+          <i data-lucide="key" class="w-4 h-4 mr-2 text-blue-600"></i> Free API Settings
         </h3>
-        <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-slate-700">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
+        <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-slate-700"><i data-lucide="x" class="w-4 h-4"></i></button>
       </div>
-
-      <div class="py-4 space-y-4 text-xs">
-        <div class="bg-gradient-to-r from-blue-50 to-cyan-50 border border-cyan-200 p-3.5 rounded-xl text-blue-950">
-          <p class="font-bold flex items-center mb-1 text-cyan-800">
-            <i data-lucide="check-circle-2" class="w-4 h-4 mr-1 text-cyan-600"></i>
-            100% Free & Unlimited Out of the Box
-          </p>
-          <p class="text-[11px] leading-relaxed text-slate-600 font-medium">
-            PaperLensAI has a deterministic clinical engine and speech engine that work instantly without any key.
-          </p>
-        </div>
-
-        <div>
-          <label class="block font-bold text-blue-950 mb-1">
-            Google Gemini 1.5/2.0 Flash API Key (Optional)
-          </label>
-          <input type="password" id="geminiApiKeyInput" class="w-full text-xs p-2.5 border border-blue-200 rounded-lg focus:ring-2 focus:ring-cyan-500" placeholder="AIzaSy...">
-          <p class="text-[11px] text-slate-500 mt-1">
-            Free forever from <a href="https://aistudio.google.com" target="_blank" class="text-cyan-600 underline font-semibold">Google AI Studio</a> (15 RPM, 1,500 RPD, no credit card required). You can also add it to Vercel as <code class="bg-slate-100 px-1 py-0.5 rounded">GEMINI_API_KEY</code>!
-          </p>
-        </div>
+      <p class="text-xs text-slate-600">
+        PaperLensAI works 100% free with its built-in clinical NLP engine. Optionally, enter your free Gemini API key below:
+      </p>
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Google Gemini API Key (Optional)</label>
+        <input type="password" id="geminiApiKeyInput" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl" placeholder="AIzaSy...">
+        <p class="text-[10px] text-slate-400 mt-1">Get free from Google AI Studio. Stored only in your local browser.</p>
       </div>
-
-      <div class="pt-3 border-t border-blue-100 flex justify-end space-x-2">
-        <button onclick="closeSettingsModal()" class="px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-lg transition">
-          Cancel
-        </button>
-        <button onclick="saveApiKeySettings()" class="px-4 py-1.5 text-xs font-bold bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-500 hover:to-blue-600 text-white rounded-lg shadow-md transition">
-          Save Configuration
-        </button>
+      <div class="flex justify-end space-x-2 pt-2 border-t border-slate-100">
+        <button onclick="closeSettingsModal()" class="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button>
+        <button onclick="saveApiKeySettings()" class="px-4 py-1.5 text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white rounded-lg">Save</button>
       </div>
     </div>
   </div>
-
-  <!-- Footer -->
-  <footer class="pharma-header text-cyan-100 py-5 px-4 sm:px-8 text-xs text-center mt-auto border-t border-cyan-500/20">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
-      <div class="font-medium">
-        <strong class="text-white">PaperLensAI</strong> — Clinical Literature Intelligence & Synthesis Suite
-      </div>
-      <div class="text-[11px] text-cyan-200">
-        Pharma-Grade Design System • Vercel Ready • 100% Free & Open-Source
-      </div>
-    </div>
-  </footer>
 
   <!-- Scripts -->
   <script src="sample_papers.js"></script>

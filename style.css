@@ -1,78 +1,35 @@
 /*
- * PaperLensAI - Biopharmaceutical Clinical Theme
- * Inspired by global pharma & biotech leaders (Novartis, Roche, Pfizer, AstraZeneca)
- * Vibrant Medical Cobalt, Cyan, Bio-Emerald & Warm Coral Accents
+ * PaperLensAI - ChatGPT / Gemini Inspired Clean UI Design System
+ * Clean, distraction-free, modern biopharma blue aesthetic.
  */
 
 :root {
-  --pharma-deep-navy: #071e3d;
-  --pharma-cobalt: #1f4287;
-  --pharma-sapphire: #0c356a;
-  --pharma-cyan: #0096c7;
-  --pharma-sky: #0284c7;
-  --pharma-aqua: #00b4d8;
-  --pharma-mint: #059669;
-  --pharma-coral: #f43f5e;
-  --pharma-amber: #d97706;
-  --pharma-bg: #f0f7ff;
+  --sidebar-bg: #0b192c;
+  --sidebar-hover: #1e3e62;
+  --brand-blue: #008170;
+  --pharma-navy: #000000;
+  --primary-accent: #0284c7;
+  --primary-hover: #0369a1;
+  --bg-main: #f8fafc;
+  --card-border: #e2e8f0;
 }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background: linear-gradient(160deg, #eff6ff 0%, #e0f2fe 40%, #f0fdfa 100%);
+  background-color: #f1f5f9;
   color: #0f172a;
-  min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Editorial Serif for Clinical Headings */
-.font-clinical-serif {
-  font-family: "Georgia", "Cambria", "Times New Roman", serif;
+/* Sidebar active item */
+.nav-item.active {
+  background-color: #0284c7;
+  color: #ffffff !important;
+  font-weight: 600;
 }
 
-/* Pharma Gradient Header */
-.pharma-header {
-  background: linear-gradient(135deg, #071e3d 0%, #0c356a 55%, #0284c7 100%);
-}
-
-/* Institutional Banner */
-.gov-banner {
-  background: #041226;
-  font-size: 0.72rem;
-  letter-spacing: 0.04em;
-}
-
-/* Pharma Card System */
-.pharma-card {
-  background: #ffffff;
-  border-radius: 12px;
-  border: 1px solid #bfdbfe;
-  box-shadow: 0 4px 20px -2px rgba(12, 53, 106, 0.08);
-  transition: all 0.2s ease-in-out;
-}
-
-.pharma-card:hover {
-  box-shadow: 0 8px 26px -4px rgba(12, 53, 106, 0.12);
-}
-
-/* Section Identity Accents */
-.card-objective {
-  background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%);
-  border-left: 4px solid #0284c7;
-}
-
-.card-findings {
-  background: #ffffff;
-  border-left: 4px solid #059669;
-}
-
-.card-safety {
-  background: linear-gradient(180deg, #fff7ed 0%, #ffffff 100%);
-  border-left: 4px solid #ea580c;
-}
-
-.card-takeaway {
-  background: linear-gradient(135deg, #071e3d 0%, #0c356a 100%);
+.nav-item:hover:not(.active) {
+  background-color: rgba(255, 255, 255, 0.08);
   color: #ffffff;
 }
 
@@ -83,29 +40,27 @@ body {
   justify-content: center;
   background-color: #0284c7;
   color: #ffffff;
-  border-radius: 5px;
+  border-radius: 4px;
   font-size: 0.72rem;
   font-weight: 700;
-  padding: 2px 7px;
-  margin: 0 4px;
+  padding: 1px 6px;
+  margin: 0 3px;
   cursor: pointer;
   transition: all 0.15s ease-in-out;
   text-decoration: none;
   vertical-align: super;
-  box-shadow: 0 1px 3px rgba(2, 132, 199, 0.3);
 }
 
 .citation-badge:hover {
   background-color: #0369a1;
-  transform: translateY(-1.5px) scale(1.05);
-  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.45);
+  transform: translateY(-1px);
 }
 
-/* Source Sentence Highlighting in Dual Inspector */
+/* Source Sentence Highlighting */
 .source-sentence {
-  padding: 6px 10px;
-  margin-bottom: 4px;
-  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  border-radius: 8px;
   transition: all 0.25s ease;
   line-height: 1.65;
   border-left: 3px solid transparent;
@@ -120,10 +75,10 @@ body {
   border-left: 4px solid #d97706;
   color: #78350f;
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.2);
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.15);
 }
 
-/* Audio Waveform Animation */
+/* Audio Waveform */
 .wave-bar {
   display: inline-block;
   width: 3.5px;
@@ -143,72 +98,19 @@ body {
 .wave-bar:nth-child(4) { animation-delay: 0.4s; }
 .wave-bar:nth-child(5) { animation-delay: 0.15s; }
 .wave-bar:nth-child(6) { animation-delay: 0.35s; }
-.wave-bar:nth-child(7) { animation-delay: 0.05s; }
-.wave-bar:nth-child(8) { animation-delay: 0.3s; }
 
 @keyframes pulse-wave {
   0% { height: 4px; }
-  50% { height: 26px; }
+  50% { height: 24px; }
   100% { height: 8px; }
 }
 
-/* Custom Scrollbars */
-::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
+/* Smooth transitions */
+.fade-in {
+  animation: fadeIn 0.2s ease-in-out;
 }
 
-::-webkit-scrollbar-track {
-  background: #e0f2fe;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #93c5fd;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #60a5fa;
-}
-
-/* Pharma Pill Chips */
-.pharma-pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 10px;
-  border-radius: 9999px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-}
-
-.pill-cyan {
-  background-color: #e0f2fe;
-  color: #0369a1;
-  border: 1px solid #7dd3fc;
-}
-
-.pill-emerald {
-  background-color: #d1fae5;
-  color: #065f46;
-  border: 1px solid #6ee7b7;
-}
-
-.pill-coral {
-  background-color: #ffe4e6;
-  color: #9f1239;
-  border: 1px solid #fda4af;
-}
-
-.pill-amber {
-  background-color: #fef3c7;
-  color: #92400e;
-  border: 1px solid #fcd34d;
-}
-
-/* Active Workbench Tab */
-.workbench-tab.active {
-  color: #0284c7 !important;
-  border-bottom: 3px solid #0284c7 !important;
-  font-weight: 700;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }

@@ -1,10 +1,9 @@
 /**
- * PaperLensAI - Core Application Controller
- * Handles UI interactions, evidence grounding split-view, speech narration, and chart rendering.
+ * PaperLensAI - Application Controller (ChatGPT / Gemini Style Multi-Page Webapp)
  */
 
-// Application State
 const appState = {
+  currentView: 'home',
   currentPaper: null,
   activeSentences: [],
   selectedFile: null,
@@ -24,26 +23,60 @@ const appState = {
   }
 };
 
-// Document Ready Initialization
 document.addEventListener('DOMContentLoaded', () => {
-  // Initialize Lucide icons
-  if (window.lucide) {
-    window.lucide.createIcons();
-  }
+  if (window.lucide) window.lucide.createIcons();
 
-  // Load initial benchmark paper (STEP-HFpEF 2023)
-  loadSamplePaper('step-hfpef-2023');
-
-  // Load saved API key in modal if available
+  // Load saved API key
   const savedKey = window.paperLensEngine.getApiKey();
   const apiKeyInput = document.getElementById('geminiApiKeyInput');
   if (apiKeyInput && savedKey) {
     apiKeyInput.value = savedKey;
   }
+
+  // Start on clean Home Page (ChatGPT / Gemini style)
+  navigateTo('home');
 });
 
 /**
- * Load Landmark Sample Paper
+ * Multi-Page Navigation Router
+ */
+function navigateTo(viewId) {
+  appState.currentView = viewId;
+
+  // Hide all page views
+  document.querySelectorAll('.page-view').forEach(el => el.classList.add('hidden'));
+
+  // Show target page view
+  const targetPage = document.getElementById(`page-${viewId}`);
+  if (targetPage) targetPage.classList.remove('hidden');
+
+  // Update Sidebar active state
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const activeNav = document.getElementById(`nav-${viewId}`);
+  if (activeNav) activeNav.classList.add('active');
+
+  // Update Header Title
+  const titles = {
+    home: 'New Clinical Analysis',
+    summary: 'Structured Clinical Summary',
+    grounding: 'Evidence Grounding & Source Inspector',
+    matrix: 'Cross-Trial Contradiction & Consensus Matrix',
+    charts: 'Quantitative Endpoint Charts',
+    audio: 'Clinical Audio Briefing ("Podcast Mode")'
+  };
+  const titleEl = document.getElementById('currentViewTitle');
+  if (titleEl) titleEl.textContent = titles[viewId] || 'PaperLensAI';
+
+  // Resize charts if opening charts page
+  if (viewId === 'charts' && appState.currentPaper) {
+    setTimeout(() => renderCharts(appState.currentPaper.metricsData), 100);
+  }
+
+  if (window.lucide) window.lucide.createIcons();
+}
+
+/**
+ * Load Landmark Sample Paper & Navigate to Summary
  */
 function loadSamplePaper(paperId) {
   const paper = SAMPLE_PAPERS.find(p => p.id === paperId);
@@ -52,44 +85,36 @@ function loadSamplePaper(paperId) {
   appState.currentPaper = paper;
   appState.activeSentences = paper.sentences;
 
-  // Update Header Banner
+  // Update Header Badge
+  const badge = document.getElementById('activeStudyBadge');
+  if (badge) {
+    badge.textContent = `Active: ${paper.title.substring(0, 35)}...`;
+    badge.classList.remove('hidden');
+  }
+
+  // Populate Structured Summary
   document.getElementById('studyTitleHeading').textContent = paper.title;
-  document.getElementById('studyJournalBadge').textContent = `${paper.journal} ${paper.year}`;
-  document.getElementById('studyTypeBadge').textContent = paper.phase;
-  document.getElementById('studySampleSizeBadge').textContent = `N = ${paper.sampleSize.toLocaleString()} Enrolled`;
-  document.getElementById('studyAuthorsP').textContent = `${paper.authors} | DOI: ${paper.doi} | PMID: ${paper.pmid}`;
-
-  // Update Quality Scores
-  document.getElementById('qualityScoreValue').textContent = `${paper.structuredSummary.qualityScore}/100`;
+  document.getElementById('studyAuthorsP').textContent = `${paper.authors} | DOI: ${paper.doi}`;
+  document.getElementById('summaryPhaseBadge').textContent = paper.phase;
+  document.getElementById('summaryJournalBadge').textContent = `${paper.journal} ${paper.year}`;
+  document.getElementById('summarySampleBadge').textContent = `N = ${paper.sampleSize.toLocaleString()}`;
   document.getElementById('groundingScoreValue').textContent = paper.structuredSummary.groundingFidelity;
-  document.getElementById('checklistN').textContent = `${paper.sampleSize.toLocaleString()} Subjects`;
 
-  // Render Structured Summary Tab
   renderStructuredSummary(paper.structuredSummary);
-
-  // Render Evidence Grounding Tab
   renderEvidenceGrounding(paper.structuredSummary, paper.sentences);
-
-  // Render Charts
   renderCharts(paper.metricsData);
-
-  // Render Audio Narration Script
-  const audioScript = window.paperLensEngine.generateAudioBriefingScript(paper.structuredSummary);
-  const audioScriptEl = document.getElementById('audioScriptText');
-  if (audioScriptEl) audioScriptEl.textContent = `"${audioScript}"`;
-
-  // If matrix tab needs update
   renderComparisonMatrix();
 
-  // Reset audio state
-  stopAudioBriefing();
+  // Audio script
+  const script = window.paperLensEngine.generateAudioBriefingScript(paper.structuredSummary);
+  document.getElementById('audioScriptText').textContent = `"${script}"`;
 
-  // Refresh icons
-  if (window.lucide) window.lucide.createIcons();
+  // Navigate to summary page
+  navigateTo('summary');
 }
 
 /**
- * Render Structured Summary
+ * Render Structured Summary Content
  */
 function renderStructuredSummary(summary) {
   document.getElementById('summaryObjective').textContent = summary.objective;
@@ -97,68 +122,55 @@ function renderStructuredSummary(summary) {
   document.getElementById('summarySafety').textContent = summary.safetyProfile;
   document.getElementById('summaryBottomLine').textContent = summary.clinicalBottomLine;
 
-  const findingsListEl = document.getElementById('keyFindingsList');
-  findingsListEl.innerHTML = '';
+  const listEl = document.getElementById('keyFindingsList');
+  listEl.innerHTML = '';
 
   summary.keyFindings.forEach((finding, idx) => {
     const item = document.createElement('div');
-    item.className = 'p-3 rounded-xl border border-blue-100 bg-gradient-to-r from-blue-50/60 to-cyan-50/40 hover:from-blue-100/60 hover:to-cyan-100/50 transition';
+    item.className = 'p-3 rounded-lg border border-slate-100 bg-slate-50 hover:bg-blue-50/40 transition flex items-start justify-between gap-3';
     item.innerHTML = `
-      <div class="flex items-start justify-between gap-3">
-        <div class="text-xs text-slate-900 leading-relaxed flex-1 font-medium">
-          <span class="font-bold text-blue-950">${idx + 1}.</span> ${finding.claim}
-          <button onclick="inspectSentence(${finding.sentenceIndex})" class="citation-badge" title="Inspect source sentence in evidence inspector">
-            [Ref ${idx + 1}]
-          </button>
-        </div>
-        <div class="text-right shrink-0">
-          <span class="inline-block px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white border border-cyan-200 text-cyan-800 shadow-2xs">
-            ${finding.metric}
-          </span>
-          <div class="text-[10px] font-bold text-slate-500 mt-0.5">${finding.pVal || ''}</div>
-        </div>
+      <div class="text-xs text-slate-800 leading-relaxed flex-1">
+        <span class="font-bold text-slate-900">${idx + 1}.</span> ${finding.claim}
+        <button onclick="inspectSentence(${finding.sentenceIndex})" class="citation-badge" title="Inspect source in Evidence Grounding">
+          [Ref ${idx + 1}]
+        </button>
+      </div>
+      <div class="text-right shrink-0">
+        <span class="inline-block px-2.5 py-0.5 rounded text-[10px] font-bold bg-white border border-slate-200 text-blue-800 shadow-2xs">
+          ${finding.metric}
+        </span>
+        <div class="text-[10px] font-semibold text-slate-400 mt-0.5">${finding.pVal || ''}</div>
       </div>
     `;
-    findingsListEl.appendChild(item);
+    listEl.appendChild(item);
   });
 }
 
 /**
- * Render Evidence Grounding & Source Sentence Inspector
+ * Render Grounding Split-View
  */
 function renderEvidenceGrounding(summary, sentences) {
-  // 1. Render Claims in Left Pane
-  const claimsListEl = document.getElementById('groundingClaimsList');
-  claimsListEl.innerHTML = '';
+  const claimsEl = document.getElementById('groundingClaimsList');
+  claimsEl.innerHTML = '';
 
   summary.keyFindings.forEach((finding, idx) => {
-    const claimCard = document.createElement('div');
-    claimCard.className = 'p-3.5 rounded-xl border border-blue-200 bg-white hover:border-cyan-500 cursor-pointer transition shadow-2xs mb-2.5 claim-card';
-    claimCard.id = `claim-card-${idx}`;
-    claimCard.onclick = () => highlightSourceSentence(finding.sentenceIndex, idx);
-    claimCard.innerHTML = `
-      <div class="flex items-center justify-between mb-1.5">
-        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-50 text-cyan-800 border border-cyan-200">
-          Claim #${idx + 1}
-        </span>
-        <span class="text-[10px] font-mono text-slate-500 font-semibold">
-          Maps to Sentence [${finding.sentenceIndex}]
-        </span>
+    const card = document.createElement('div');
+    card.className = 'p-3 rounded-lg border border-slate-200 bg-white hover:border-blue-500 cursor-pointer transition text-xs space-y-1 claim-card';
+    card.id = `claim-card-${idx}`;
+    card.onclick = () => highlightSourceSentence(finding.sentenceIndex, idx);
+    card.innerHTML = `
+      <div class="flex items-center justify-between text-[10px]">
+        <span class="font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">Claim #${idx + 1}</span>
+        <span class="text-slate-400 font-mono">Sentence [${finding.sentenceIndex}]</span>
       </div>
-      <p class="text-xs text-blue-950 font-semibold leading-relaxed">
-        ${finding.claim}
-      </p>
-      <div class="mt-2 flex items-center justify-between text-[11px] text-cyan-800">
-        <span class="font-bold bg-blue-50 px-2 py-0.5 rounded">${finding.metric}</span>
-        <span class="font-bold text-slate-500">${finding.pVal}</span>
-      </div>
+      <p class="text-slate-800 font-medium leading-relaxed">${finding.claim}</p>
+      <div class="text-[11px] font-bold text-blue-800 pt-1">${finding.metric} • ${finding.pVal}</div>
     `;
-    claimsListEl.appendChild(claimCard);
+    claimsEl.appendChild(card);
   });
 
-  // 2. Render Source Sentences in Right Pane
-  const sourceViewerEl = document.getElementById('sourceSentenceViewer');
-  sourceViewerEl.innerHTML = '';
+  const viewerEl = document.getElementById('sourceSentenceViewer');
+  viewerEl.innerHTML = '';
   document.getElementById('sourceSentenceCountBadge').textContent = `${sentences.length} Sentences Indexed`;
 
   sentences.forEach((sentence, idx) => {
@@ -166,122 +178,101 @@ function renderEvidenceGrounding(summary, sentences) {
     sEl.className = 'source-sentence';
     sEl.id = `source-sentence-${idx}`;
     sEl.innerHTML = `
-      <span class="text-slate-400 font-bold mr-1.5 select-none">[${idx}]</span>
+      <span class="text-slate-400 font-bold mr-2 select-none">[${idx}]</span>
       <span>${sentence}</span>
     `;
-    sourceViewerEl.appendChild(sEl);
+    viewerEl.appendChild(sEl);
   });
 }
 
-/**
- * Highlight Sentence in Inspector from Citation Tag
- */
 function inspectSentence(sentenceIndex) {
-  switchWorkbenchTab('grounding');
+  navigateTo('grounding');
   highlightSourceSentence(sentenceIndex);
 }
 
 function highlightSourceSentence(sentenceIndex, claimIdx = null) {
-  // Clear existing highlights
   document.querySelectorAll('.source-sentence').forEach(el => el.classList.remove('highlighted'));
-  document.querySelectorAll('.claim-card').forEach(el => el.classList.remove('border-teal-600', 'bg-teal-50/20'));
+  document.querySelectorAll('.claim-card').forEach(el => el.classList.remove('border-blue-600', 'bg-blue-50/20'));
 
   if (claimIdx !== null) {
-    const activeCard = document.getElementById(`claim-card-${claimIdx}`);
-    if (activeCard) activeCard.classList.add('border-teal-600', 'bg-teal-50/20');
+    const card = document.getElementById(`claim-card-${claimIdx}`);
+    if (card) card.classList.add('border-blue-600', 'bg-blue-50/20');
   }
 
-  const targetSentence = document.getElementById(`source-sentence-${sentenceIndex}`);
-  if (targetSentence) {
-    targetSentence.classList.add('highlighted');
-    targetSentence.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const target = document.getElementById(`source-sentence-${sentenceIndex}`);
+  if (target) {
+    target.classList.add('highlighted');
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 }
 
 function clearInspectorHighlights() {
   document.querySelectorAll('.source-sentence').forEach(el => el.classList.remove('highlighted'));
-  document.querySelectorAll('.claim-card').forEach(el => el.classList.remove('border-teal-600', 'bg-teal-50/20'));
+  document.querySelectorAll('.claim-card').forEach(el => el.classList.remove('border-blue-600', 'bg-blue-50/20'));
 }
 
 /**
- * Render Cross-Study Contradiction & Consensus Matrix
+ * Render Contradiction & Consensus Matrix
  */
 function renderComparisonMatrix() {
   const matrix = CONSENSUS_CONTRADICTION_MATRIX;
 
-  // Chips
-  const chipsContainer = document.getElementById('matrixStudiesChips');
-  chipsContainer.innerHTML = '';
-  matrix.studiesCompared.forEach(title => {
+  const chipsEl = document.getElementById('matrixStudiesChips');
+  chipsEl.innerHTML = '';
+  matrix.studiesCompared.forEach(t => {
     const chip = document.createElement('span');
-    chip.className = 'px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-900 border border-blue-200 shadow-2xs';
-    chip.textContent = title;
-    chipsContainer.appendChild(chip);
+    chip.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200';
+    chip.textContent = t;
+    chipsEl.appendChild(chip);
   });
 
-  // Consensus Points
-  const consensusList = document.getElementById('consensusList');
-  consensusList.innerHTML = '';
+  const consensusEl = document.getElementById('consensusList');
+  consensusEl.innerHTML = '';
   matrix.consensusPoints.forEach((pt, idx) => {
-    const item = document.createElement('div');
-    item.className = 'pt-3.5 pb-2 first:pt-0';
-    item.innerHTML = `
-      <div class="flex items-start justify-between">
-        <h5 class="text-xs font-bold text-blue-950">${idx + 1}. ${pt.topic}</h5>
-        <span class="text-[10px] font-bold text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded-full border border-emerald-300">
-          ${pt.confidence}
-        </span>
+    const div = document.createElement('div');
+    div.className = 'pt-3 pb-2 first:pt-0 text-xs';
+    div.innerHTML = `
+      <div class="flex items-center justify-between font-bold text-slate-900 mb-1">
+        <span>${idx + 1}. ${pt.topic}</span>
+        <span class="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">${pt.confidence}</span>
       </div>
-      <p class="text-xs text-slate-700 mt-1 leading-relaxed font-medium">${pt.finding}</p>
-      <div class="mt-2 text-[11px] text-slate-700 font-mono bg-blue-50/60 p-2.5 rounded-lg border border-blue-100">
-        <span class="font-bold text-cyan-800">Grounding Evidence:</span> "${pt.groundingSnippet}"
+      <p class="text-slate-600 mb-2 leading-relaxed">${pt.finding}</p>
+      <div class="bg-slate-50 p-2 rounded text-[11px] text-slate-500 font-mono">
+        <strong class="text-slate-700">Evidence:</strong> "${pt.groundingSnippet}"
       </div>
     `;
-    consensusList.appendChild(item);
+    consensusEl.appendChild(div);
   });
 
-  // Contradictions
-  const contradictionsList = document.getElementById('contradictionsList');
-  contradictionsList.innerHTML = '';
+  const contradictionsEl = document.getElementById('contradictionsList');
+  contradictionsEl.innerHTML = '';
   matrix.contradictionPoints.forEach((ct, idx) => {
-    const item = document.createElement('div');
-    item.className = 'pt-3.5 pb-2 first:pt-0';
-    item.innerHTML = `
-      <div class="flex items-start justify-between">
-        <h5 class="text-xs font-bold text-rose-950">${idx + 1}. ${ct.topic}</h5>
-        <span class="text-[10px] font-bold text-rose-800 bg-rose-100/70 px-2 py-0.5 rounded-full border border-rose-300">
-          ${ct.status}
-        </span>
+    const div = document.createElement('div');
+    div.className = 'pt-3 pb-2 first:pt-0 text-xs';
+    div.innerHTML = `
+      <div class="flex items-center justify-between font-bold text-slate-900 mb-1">
+        <span>${idx + 1}. ${ct.topic}</span>
+        <span class="text-[10px] text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">${ct.status}</span>
       </div>
-      <p class="text-xs text-slate-700 mt-1 leading-relaxed font-medium">${ct.finding}</p>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2.5">
-        <div class="bg-blue-50/60 p-2.5 rounded-lg border border-blue-200/80 text-[11px]">
-          <span class="font-bold text-blue-950 block mb-0.5">Trial Evidence A:</span>
-          <span class="text-slate-700">${ct.evidenceA}</span>
+      <p class="text-slate-600 mb-2 leading-relaxed">${ct.finding}</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px] mb-2">
+        <div class="bg-slate-50 p-2 rounded border border-slate-100">
+          <strong class="block text-slate-800">Study A:</strong> ${ct.evidenceA}
         </div>
-        <div class="bg-blue-50/60 p-2.5 rounded-lg border border-blue-200/80 text-[11px]">
-          <span class="font-bold text-blue-950 block mb-0.5">Trial Evidence B:</span>
-          <span class="text-slate-700">${ct.evidenceB}</span>
+        <div class="bg-slate-50 p-2 rounded border border-slate-100">
+          <strong class="block text-slate-800">Study B:</strong> ${ct.evidenceB}
         </div>
       </div>
-
-      <div class="mt-2.5 text-[11px] text-amber-950 bg-amber-50 p-2.5 rounded-lg border border-amber-200 flex items-start">
-        <i data-lucide="alert-triangle" class="w-3.5 h-3.5 mr-1.5 text-amber-600 shrink-0 mt-0.5"></i>
-        <span><strong>Clinical Impact:</strong> ${ct.clinicalImpact}</span>
+      <div class="text-[11px] text-amber-900 bg-amber-50 p-2 rounded border border-amber-200">
+        <strong>Clinical Impact:</strong> ${ct.clinicalImpact}
       </div>
     `;
-    contradictionsList.appendChild(item);
+    contradictionsEl.appendChild(div);
   });
-}
-
-function loadMultiPaperBenchmark() {
-  switchWorkbenchTab('matrix');
-  document.getElementById('intakeDrawer').classList.add('hidden');
 }
 
 /**
- * Render Dynamic Quantitative Charts (Chart.js)
+ * Render Charts
  */
 function renderCharts(metricsData) {
   if (!metricsData) return;
@@ -291,87 +282,49 @@ function renderCharts(metricsData) {
 
   if (!efficacyCtx || !adverseCtx) return;
 
-  // Destroy previous charts if active
   if (appState.charts.efficacyChart) appState.charts.efficacyChart.destroy();
   if (appState.charts.adverseChart) appState.charts.adverseChart.destroy();
 
-  // Efficacy Chart
   appState.charts.efficacyChart = new Chart(efficacyCtx, {
     type: 'bar',
     data: {
       labels: metricsData.labels,
       datasets: [{
-        label: 'Primary Endpoint Efficacy Metric',
+        label: 'Efficacy Metric Delta',
         data: metricsData.efficacyScore,
-        backgroundColor: ['rgba(13, 148, 136, 0.85)', 'rgba(148, 163, 184, 0.6)'],
-        borderColor: ['#0d9488', '#94a3b8'],
-        borderWidth: 1.5,
-        borderRadius: 4
+        backgroundColor: ['#0284c7', '#94a3b8'],
+        borderRadius: 6
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: '#0f172a',
-          titleFont: { size: 12 },
-          bodyFont: { size: 12 }
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          grid: { color: '#f1f5f9' },
-          ticks: { font: { size: 10 } }
-        },
-        x: {
-          grid: { display: false },
-          ticks: { font: { size: 10, weight: 'bold' } }
-        }
-      }
+      plugins: { legend: { display: false } }
     }
   });
 
-  // Adverse Events Chart
   const aeData = metricsData.seriousAePct || metricsData.primaryEventRatePct || [13.3, 26.7];
   appState.charts.adverseChart = new Chart(adverseCtx, {
     type: 'bar',
     data: {
       labels: metricsData.labels,
       datasets: [{
-        label: 'Adverse Event Rate (%)',
+        label: 'Adverse Event %',
         data: aeData,
-        backgroundColor: ['rgba(225, 29, 72, 0.75)', 'rgba(217, 119, 6, 0.6)'],
-        borderColor: ['#e11d48', '#d97706'],
-        borderWidth: 1.5,
-        borderRadius: 4
+        backgroundColor: ['#e11d48', '#d97706'],
+        borderRadius: 6
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          grid: { color: '#f1f5f9' },
-          ticks: { font: { size: 10 } }
-        },
-        x: {
-          grid: { display: false },
-          ticks: { font: { size: 10, weight: 'bold' } }
-        }
-      }
+      plugins: { legend: { display: false } }
     }
   });
 }
 
 /**
- * 30-Second Audio Narration ("Podcast Mode") using Web Speech Synthesis
+ * Audio Briefing Controller
  */
 function toggleAudioBriefing() {
   if (appState.audio.isPlaying) {
@@ -381,118 +334,50 @@ function toggleAudioBriefing() {
   }
 }
 
-function triggerQuickAudioBriefing() {
-  switchWorkbenchTab('audio');
-  startAudioBriefing();
-}
-
 function startAudioBriefing() {
   if (!('speechSynthesis' in window)) {
-    alert("Web Speech API is not supported in this browser. Please use a modern browser like Chrome, Edge, or Safari.");
+    alert("Speech synthesis is not supported on this browser.");
     return;
   }
-
-  // Cancel any ongoing speech
   window.speechSynthesis.cancel();
 
-  const scriptText = window.paperLensEngine.generateAudioBriefingScript(
+  const script = window.paperLensEngine.generateAudioBriefingScript(
     appState.currentPaper ? appState.currentPaper.structuredSummary : null
   );
 
-  const utterance = new SpeechSynthesisUtterance(scriptText);
+  const utterance = new SpeechSynthesisUtterance(script);
   utterance.rate = appState.audio.speechRate;
-  utterance.pitch = 1.0;
-
-  // Select a pleasant natural English voice if available
-  const voices = window.speechSynthesis.getVoices();
-  const naturalVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha')));
-  if (naturalVoice) utterance.voice = naturalVoice;
-
+  
   utterance.onstart = () => {
     appState.audio.isPlaying = true;
     updateAudioUI(true);
-    startProgressTimer();
   };
-
-  utterance.onend = () => {
-    stopAudioBriefing();
-  };
-
-  utterance.onerror = (e) => {
-    console.error("Speech error", e);
-    stopAudioBriefing();
-  };
+  utterance.onend = () => stopAudioBriefing();
+  utterance.onerror = () => stopAudioBriefing();
 
   appState.audio.utterance = utterance;
   window.speechSynthesis.speak(utterance);
 }
 
 function stopAudioBriefing() {
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
-  }
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
   appState.audio.isPlaying = false;
-  clearInterval(appState.audio.progressInterval);
-  appState.audio.elapsedSeconds = 0;
   updateAudioUI(false);
 }
 
 function updateAudioUI(isPlaying) {
-  // Waveform bars
   document.querySelectorAll('.wave-bar').forEach(b => {
     if (isPlaying) b.classList.add('playing');
     else b.classList.remove('playing');
   });
 
-  // Play / Pause Icons
-  const miniPlayIcon = document.getElementById('miniPlayIcon');
-  const mainPlayIcon = document.getElementById('mainPlayIcon');
-  const audioStatusBadge = document.getElementById('audioStatusBadge');
+  const playIcon = document.getElementById('mainPlayIcon');
+  if (playIcon) playIcon.setAttribute('data-lucide', isPlaying ? 'pause' : 'play');
 
-  if (miniPlayIcon) {
-    miniPlayIcon.setAttribute('data-lucide', isPlaying ? 'pause' : 'play');
-  }
-  if (mainPlayIcon) {
-    mainPlayIcon.setAttribute('data-lucide', isPlaying ? 'pause' : 'play');
-  }
-  if (audioStatusBadge) {
-    audioStatusBadge.textContent = isPlaying ? 'Broadcasting Narration' : 'Ready to Stream';
-    audioStatusBadge.className = isPlaying ? 'bg-teal-600 px-2 py-0.5 rounded text-[11px] text-white animate-pulse' : 'bg-slate-800 px-2 py-0.5 rounded text-[11px] text-slate-300';
-  }
+  const badge = document.getElementById('audioStatusBadge');
+  if (badge) badge.textContent = isPlaying ? 'Broadcasting Narration...' : 'Ready';
 
   if (window.lucide) window.lucide.createIcons();
-}
-
-function startProgressTimer() {
-  clearInterval(appState.audio.progressInterval);
-  appState.audio.elapsedSeconds = 0;
-
-  const miniBar = document.getElementById('audioProgressBar');
-  const mainBar = document.getElementById('mainAudioProgressBar');
-  const timerLabel = document.getElementById('audioTimer');
-
-  appState.audio.progressInterval = setInterval(() => {
-    if (!appState.audio.isPlaying) {
-      clearInterval(appState.audio.progressInterval);
-      return;
-    }
-
-    appState.audio.elapsedSeconds++;
-    const total = appState.audio.totalSeconds;
-    const pct = Math.min(100, (appState.audio.elapsedSeconds / total) * 100);
-
-    if (miniBar) miniBar.style.width = `${pct}%`;
-    if (mainBar) mainBar.style.width = `${pct}%`;
-
-    const mins = Math.floor(appState.audio.elapsedSeconds / 60);
-    const secs = appState.audio.elapsedSeconds % 60;
-    const formatted = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-    if (timerLabel) timerLabel.textContent = `${formatted} / 0:32`;
-
-    if (appState.audio.elapsedSeconds >= total) {
-      clearInterval(appState.audio.progressInterval);
-    }
-  }, 1000);
 }
 
 function setPlaybackSpeed(speed) {
@@ -500,83 +385,44 @@ function setPlaybackSpeed(speed) {
   [1.0, 1.25, 1.5].forEach(s => {
     const btn = document.getElementById(`speedBtn${s === 1.0 ? '1' : s === 1.25 ? '125' : '15'}`);
     if (btn) {
-      if (s === speed) {
-        btn.className = 'px-2 py-0.5 rounded font-bold bg-teal-600 text-white';
-      } else {
-        btn.className = 'px-2 py-0.5 rounded font-medium bg-slate-800 text-slate-300 hover:bg-slate-700';
-      }
+      if (s === speed) btn.className = 'px-2.5 py-0.5 rounded font-bold bg-blue-600 text-white';
+      else btn.className = 'px-2.5 py-0.5 rounded text-slate-400 hover:text-white';
     }
   });
-
-  if (appState.audio.isPlaying) {
-    startAudioBriefing(); // Restart with new rate
-  }
+  if (appState.audio.isPlaying) startAudioBriefing();
 }
 
-function skipAudio(seconds) {
-  appState.audio.elapsedSeconds = Math.max(0, appState.audio.elapsedSeconds + seconds);
+function skipAudio(sec) {
+  // Restart or proceed
+  if (appState.audio.isPlaying) startAudioBriefing();
 }
 
 /**
- * Workbench Tab Switching
+ * File & Prompt Input Handling
  */
-function switchWorkbenchTab(tabKey) {
-  const tabs = ['summary', 'grounding', 'matrix', 'metrics', 'audio'];
-  tabs.forEach(t => {
-    const content = document.getElementById(`tabContent${t.charAt(0).toUpperCase() + t.slice(1)}`);
-    const btn = document.getElementById(`tabBtn${t.charAt(0).toUpperCase() + t.slice(1)}`);
-
-    if (t === tabKey) {
-      content?.classList.remove('hidden');
-      btn?.classList.add('active', 'text-slate-900', 'border-b-2', 'border-teal-600');
-      btn?.classList.remove('text-slate-500');
-    } else {
-      content?.classList.add('hidden');
-      btn?.classList.remove('active', 'text-slate-900', 'border-b-2', 'border-teal-600');
-      btn?.classList.add('text-slate-500');
-    }
-  });
-
-  // Re-trigger chart resize if metrics tab opened
-  if (tabKey === 'metrics' && appState.currentPaper) {
-    setTimeout(() => renderCharts(appState.currentPaper.metricsData), 100);
-  }
-
-  if (window.lucide) window.lucide.createIcons();
-}
-
-/**
- * Intake Drawer & File Handling
- */
-function toggleIntakeDrawer() {
-  const drawer = document.getElementById('intakeDrawer');
-  drawer.classList.toggle('hidden');
-}
-
 function switchInputMode(mode) {
   appState.inputMode = mode;
   const dropZone = document.getElementById('dropZoneArea');
   const pasteArea = document.getElementById('pasteArea');
-  const tabUploadBtn = document.getElementById('tabUploadBtn');
-  const tabPasteBtn = document.getElementById('tabPasteBtn');
+  const uploadBtn = document.getElementById('homeTabUploadBtn');
+  const pasteBtn = document.getElementById('homeTabPasteBtn');
 
   if (mode === 'upload') {
     dropZone.classList.remove('hidden');
     pasteArea.classList.add('hidden');
-    tabUploadBtn.className = 'pb-2 text-xs font-bold text-teal-700 border-b-2 border-teal-600 flex items-center';
-    tabPasteBtn.className = 'pb-2 text-xs font-medium text-slate-500 hover:text-slate-800 flex items-center';
+    uploadBtn.className = 'text-xs font-bold text-blue-600 border-b-2 border-blue-600 pb-1 flex items-center';
+    pasteBtn.className = 'text-xs font-semibold text-slate-400 hover:text-slate-700 pb-1 flex items-center';
   } else {
     dropZone.classList.add('hidden');
     pasteArea.classList.remove('hidden');
-    tabPasteBtn.className = 'pb-2 text-xs font-bold text-teal-700 border-b-2 border-teal-600 flex items-center';
-    tabUploadBtn.className = 'pb-2 text-xs font-medium text-slate-500 hover:text-slate-800 flex items-center';
+    pasteBtn.className = 'text-xs font-bold text-blue-600 border-b-2 border-blue-600 pb-1 flex items-center';
+    uploadBtn.className = 'text-xs font-semibold text-slate-400 hover:text-slate-700 pb-1 flex items-center';
   }
 }
 
 async function handleFileSelected(event) {
   const file = event.target.files[0];
   if (!file) return;
-
   appState.selectedFile = file;
   document.getElementById('selectedFileName').textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
   document.getElementById('selectedFileInfo').classList.remove('hidden');
@@ -592,28 +438,20 @@ function clearSelectedFile(event) {
 function setClinicalAngle(angle) {
   appState.selectedAngle = angle;
   document.getElementById('customAngleInput').value = angle;
-  document.querySelectorAll('.angle-chip').forEach(c => {
-    if (c.textContent.trim().includes(angle.split(' ')[0])) {
-      c.className = 'angle-chip px-2.5 py-1 text-[11px] font-bold bg-teal-600 text-white rounded-full border border-teal-600 transition';
-    } else {
-      c.className = 'angle-chip px-2.5 py-1 text-[11px] font-medium bg-slate-100 hover:bg-teal-50 hover:text-teal-800 text-slate-700 rounded-full border border-slate-200 transition';
-    }
-  });
 }
 
 /**
- * Execute Ingestion & Analysis
+ * Execute Clinical Synthesis
  */
 async function runClinicalSynthesis() {
   const customQuery = document.getElementById('customAngleInput').value.trim();
   let textToAnalyze = '';
-  let paperTitle = 'Uploaded Clinical Investigation';
+  let paperTitle = 'Uploaded Clinical Paper';
 
-  // Show loading indicator
-  const synthesizeBtn = document.querySelector('button[onclick="runClinicalSynthesis()"]');
-  const originalBtnHtml = synthesizeBtn.innerHTML;
-  synthesizeBtn.innerHTML = `<span class="inline-block animate-spin mr-2">⚙️</span> Synthesizing Evidence...`;
-  synthesizeBtn.disabled = true;
+  const btn = document.querySelector('button[onclick="runClinicalSynthesis()"]');
+  const originalHtml = btn.innerHTML;
+  btn.innerHTML = `<span class="animate-spin mr-2">⚙️</span> Synthesizing Evidence...`;
+  btn.disabled = true;
 
   try {
     if (appState.inputMode === 'upload' && appState.selectedFile) {
@@ -622,15 +460,14 @@ async function runClinicalSynthesis() {
       paperTitle = parsed.title;
     } else if (appState.inputMode === 'paste') {
       textToAnalyze = document.getElementById('rawPaperText').value.trim();
-      paperTitle = "Custom Pasted Research Clinical Abstract";
+      paperTitle = "Pasted Clinical Abstract";
     }
 
     if (!textToAnalyze) {
-      alert("Please upload a PDF/text file or paste an abstract text before synthesizing.");
+      alert("Please upload a PDF/text file or paste text first, or click one of the sample trials below!");
       return;
     }
 
-    // Call Engine (Gemini API or Free Deterministic Engine)
     const result = await window.paperLensEngine.analyzePaper(textToAnalyze, {
       title: paperTitle,
       clinicalAngle: appState.selectedAngle,
@@ -642,7 +479,7 @@ async function runClinicalSynthesis() {
       title: paperTitle,
       journal: "Ingested Study Document",
       year: "2024",
-      doi: "N/A (User Upload)",
+      doi: "N/A",
       pmid: "N/A",
       phase: result.riskOfBias || "Standard Clinical Protocol",
       sampleSize: result.sampleSize || 0,
@@ -656,41 +493,43 @@ async function runClinicalSynthesis() {
     appState.currentPaper = newPaper;
     appState.activeSentences = result.sentences;
 
-    // Update UI
-    document.getElementById('studyTitleHeading').textContent = newPaper.title;
-    document.getElementById('studyJournalBadge').textContent = newPaper.journal;
-    document.getElementById('studyTypeBadge').textContent = newPaper.phase;
-    document.getElementById('studySampleSizeBadge').textContent = `N = ${newPaper.sampleSize}`;
-    document.getElementById('studyAuthorsP').textContent = `Clinical Ingestion Pipeline | ${newPaper.sentences.length} Sentences Extracted`;
+    // Update active badge in top bar
+    const badge = document.getElementById('activeStudyBadge');
+    if (badge) {
+      badge.textContent = `Active: ${paperTitle.substring(0, 30)}...`;
+      badge.classList.remove('hidden');
+    }
 
-    document.getElementById('qualityScoreValue').textContent = `${result.qualityScore}/100`;
+    // Populate and switch to summary view
+    document.getElementById('studyTitleHeading').textContent = newPaper.title;
+    document.getElementById('studyAuthorsP').textContent = `${newPaper.authors} | ${newPaper.sentences.length} sentences extracted`;
+    document.getElementById('summaryPhaseBadge').textContent = newPaper.phase;
+    document.getElementById('summaryJournalBadge').textContent = newPaper.journal;
+    document.getElementById('summarySampleBadge').textContent = `N = ${newPaper.sampleSize}`;
     document.getElementById('groundingScoreValue').textContent = result.groundingFidelity;
-    document.getElementById('checklistN').textContent = `${newPaper.sampleSize} Subjects`;
 
     renderStructuredSummary(result);
     renderEvidenceGrounding(result, result.sentences);
     renderCharts(result.metricsData);
+    renderComparisonMatrix();
 
-    const audioScript = window.paperLensEngine.generateAudioBriefingScript(result);
-    document.getElementById('audioScriptText').textContent = `"${audioScript}"`;
+    const script = window.paperLensEngine.generateAudioBriefingScript(result);
+    document.getElementById('audioScriptText').textContent = `"${script}"`;
 
-    // Switch to summary tab
-    switchWorkbenchTab('summary');
-
-    // Scroll to results
-    document.getElementById('studyHeaderBanner').scrollIntoView({ behavior: 'smooth' });
+    // Navigate to summary
+    navigateTo('summary');
 
   } catch (err) {
-    console.error("Analysis error:", err);
-    alert("Error during synthesis: " + err.message);
+    console.error("Synthesis error:", err);
+    alert("Error: " + err.message);
   } finally {
-    synthesizeBtn.innerHTML = originalBtnHtml;
-    synthesizeBtn.disabled = false;
+    btn.innerHTML = originalHtml;
+    btn.disabled = false;
   }
 }
 
 /**
- * Settings Modal
+ * Settings & Printing
  */
 function openSettingsModal() {
   document.getElementById('settingsModal').classList.remove('hidden');
@@ -704,12 +543,9 @@ function saveApiKeySettings() {
   const key = document.getElementById('geminiApiKeyInput').value;
   window.paperLensEngine.setApiKey(key);
   closeSettingsModal();
-  alert("Settings saved! Free Gemini API integration is active.");
+  alert("Settings saved! Free Gemini API is active.");
 }
 
-/**
- * Clinical Report Export
- */
 function exportClinicalReport() {
   window.print();
 }
