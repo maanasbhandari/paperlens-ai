@@ -135,6 +135,7 @@ Map every key finding to the exact sentence index from the indexed text below.
 
 Return JSON schema:
 {
+  "extractedTitle": "Accurate, concise title of the clinical trial/paper/dataset (max 50 chars)",
   "objective": "Clear clinical objective & population",
   "methodology": "Study design, blinding, sample size N, intervention, control",
   "sampleSize": 1234,
@@ -245,6 +246,7 @@ ${indexed}`;
 
     return {
       title,
+      extractedTitle: title,
       sampleSize: sampleSize || "Not specified",
       objective: objectiveSentence,
       methodology: methodSentence,

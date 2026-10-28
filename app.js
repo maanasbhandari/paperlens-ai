@@ -84,7 +84,19 @@ function initHistory() {
 }
 
 function saveHistoryToStorage() {
-  localStorage.setItem('paperlens_chat_history', JSON.stringify(appState.history));
+  try {
+    localStorage.setItem('paperlens_chat_history', JSON.stringify(appState.history));
+  } catch (err) {
+    console.warn("Storage quota exceeded or error saving history", err);
+    try {
+      if (appState.history.length > 15) {
+        appState.history = appState.history.slice(0, 15);
+        localStorage.setItem('paperlens_chat_history', JSON.stringify(appState.history));
+      }
+    } catch (e) {
+      console.error("Could not write to localStorage", e);
+    }
+  }
   updateHistoryBadge();
 }
 
@@ -203,16 +215,99 @@ function clearAllHistory() {
 
 function addSessionToHistory(paper) {
   if (!paper) return;
+
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const rawTitle = paper.title || 'Clinical Study';
+  const cleanTitle = rawTitle.length > 42 ? rawTitle.substring(0, 40) + '...' : rawTitle;
+
   const newSession = {
     id: "hist-" + Date.now(),
-    title: paper.title ? (paper.title.length > 36 ? paper.title.substring(0, 36) + "..." : paper.title) : "Clinical Study",
-    time: "Just now",
+    title: cleanTitle,
+    time: `Today, ${timeStr}`,
     timestamp: Date.now(),
     paperData: paper
   };
-  // Prepend
-  appState.history.unshift(newSession);
+
+  // Avoid duplicate immediately consecutive identical session titles
+  if (appState.history.length > 0 && appState.history[0].title === cleanTitle) {
+    appState.history[0] = newSession;
+  } else {
+    appState.history.unshift(newSession);
+  }
+
+  // Keep up to 35 saved conversations
+  if (appState.history.length > 35) {
+    appState.history = appState.history.slice(0, 35);
+  }
+
   saveHistoryToStorage();
+  renderHistoryList();
+}
+
+/**
+ * Smart Title Extraction for Pasted Abstracts and Uploaded Datasets
+ */
+function extractSmartTitle(text, customQuery = '') {
+  if (!text || typeof text !== 'string') {
+    return customQuery ? sanitizeTitle(customQuery) : 'Clinical Study';
+  }
+
+  const cleanText = text.trim();
+  const lines = cleanText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+
+  // 1. Explicit Title or Dataset headers (e.g. Title: ..., Dataset: ..., Trial: ...)
+  for (const line of lines.slice(0, 8)) {
+    const headerMatch = line.match(/^(?:Title|TITLE|Study Title|Dataset|Data Set|Trial Name|Paper Title):\s*(.+)/i);
+    if (headerMatch && headerMatch[1].trim().length > 3) {
+      return sanitizeTitle(headerMatch[1]);
+    }
+  }
+
+  // 2. Scan first few lines for typical academic paper titles (15-180 chars, not section headers, not citations)
+  for (let i = 0; i < Math.min(lines.length, 6); i++) {
+    const line = lines[i];
+    // Skip PubMed numbering or headers like "1. N Engl J Med...", "PMID: ...", "DOI: ..."
+    if (/^(PMID|DOI|PMCID|ISSN|ISBN|ClinicalTrials\.gov|NCT\d+):/i.test(line)) continue;
+    if (/^\d+\.\s+[A-Z]/.test(line) && (line.includes('J Med') || line.includes('Lancet') || line.includes('doi') || line.includes('http') || line.includes('Abstract'))) continue;
+    if (/^(abstract|structured abstract|background|methods|objective|results|conclusions?):/i.test(line)) continue;
+    if (/^(authors?|affiliations?|correspondence):/i.test(line)) continue;
+
+    // Academic titles are usually clean phrases between 12 and 180 characters and don't end with a colon
+    if (line.length >= 12 && line.length <= 180 && !line.endsWith(':')) {
+      return sanitizeTitle(line);
+    }
+  }
+
+  // 3. User's custom query or prompt if provided
+  if (customQuery && customQuery.trim().length >= 4) {
+    return sanitizeTitle(customQuery);
+  }
+
+  // 4. Extract subject from opening sentence (stripping BACKGROUND: / OBJECTIVE: / etc.)
+  const firstSentenceMatch = cleanText.match(/^([^\.\n\?!]+)/);
+  if (firstSentenceMatch) {
+    let candidate = firstSentenceMatch[1]
+      .replace(/^(BACKGROUND|OBJECTIVE|RATIONALE|INTRODUCTION|CONTEXT|AIMS?|STUDY OBJECTIVE):\s*/i, '')
+      .replace(/^(we evaluated|we investigated|this study assessed|to evaluate|to determine)\s+/i, '')
+      .trim();
+    if (candidate.length >= 10) {
+      return sanitizeTitle(candidate);
+    }
+  }
+
+  return 'Clinical Abstract Analysis';
+}
+
+function sanitizeTitle(str) {
+  let clean = str.replace(/[#\*_\[\]`]/g, '').replace(/\.$/, '').trim();
+  if (clean.length > 0) {
+    clean = clean.charAt(0).toUpperCase() + clean.slice(1);
+  }
+  if (clean.length > 55) {
+    return clean.substring(0, 52) + '...';
+  }
+  return clean;
 }
 
 /**
@@ -253,8 +348,55 @@ function navigateTo(viewId) {
   if (window.lucide) window.lucide.createIcons();
 }
 
-function resetToIntakeScreen() {
+/**
+ * Start New Conversation / Fresh Front Page (ChatGPT & Antigravity Style)
+ * Resets file uploads, textareas, prompt inputs, and active study indicators.
+ */
+function startNewConversation() {
+  // 1. Reset state
+  appState.currentPaper = null;
+  appState.activeSentences = [];
+  appState.selectedFile = null;
+  appState.selectedAngle = '';
+
+  // 2. Clear File Input & File Info UI
+  const fileInput = document.getElementById('fileInput');
+  if (fileInput) fileInput.value = '';
+  const selectedFileInfo = document.getElementById('selectedFileInfo');
+  if (selectedFileInfo) selectedFileInfo.classList.add('hidden');
+  const fileNameDisplay = document.getElementById('selectedFileName');
+  if (fileNameDisplay) fileNameDisplay.textContent = '';
+
+  // 3. Clear Pasted Textarea
+  const rawPaperText = document.getElementById('rawPaperText');
+  if (rawPaperText) rawPaperText.value = '';
+
+  // 4. Clear Custom Prompt / Clinical Angle Input
+  const customAngleInput = document.getElementById('customAngleInput');
+  if (customAngleInput) customAngleInput.value = '';
+
+  // 5. Hide Active Study Badge in the Top Navigation Header
+  const activeStudyBadge = document.getElementById('activeStudyBadge');
+  if (activeStudyBadge) {
+    activeStudyBadge.classList.add('hidden');
+    activeStudyBadge.textContent = '';
+  }
+
+  // 6. Reset Input Mode to 'upload' (default clean file dropzone)
+  switchInputMode('upload');
+
+  // 7. Clear Inspector highlights
+  clearInspectorHighlights();
+
+  // 8. Re-render history list so no past item has active styling
+  renderHistoryList();
+
+  // 9. Navigate back to Home intake screen
   navigateTo('home');
+}
+
+function resetToIntakeScreen() {
+  startNewConversation();
 }
 
 /**
@@ -642,9 +784,14 @@ async function runClinicalSynthesis() {
       const parsed = await window.documentIngestionService.parseFile(appState.selectedFile);
       textToAnalyze = parsed.text;
       paperTitle = parsed.title;
+      // If file name is generic or a raw extension, extract the genuine study title from text
+      if (!paperTitle || paperTitle === 'Clinical Document' || /\.(pdf|txt|docx)$/i.test(paperTitle)) {
+        const smart = extractSmartTitle(textToAnalyze, customQuery);
+        if (smart && smart !== 'Clinical Abstract Analysis') paperTitle = smart;
+      }
     } else if (appState.inputMode === 'paste') {
       textToAnalyze = document.getElementById('rawPaperText').value.trim();
-      paperTitle = "Pasted Clinical Abstract";
+      paperTitle = extractSmartTitle(textToAnalyze, customQuery);
     }
 
     if (!textToAnalyze) {
@@ -658,6 +805,10 @@ async function runClinicalSynthesis() {
       clinicalAngle: customQuery,
       customPrompt: customQuery
     });
+
+    if (result.extractedTitle && result.extractedTitle.length > 5 && result.extractedTitle !== 'Clinical Investigation') {
+      paperTitle = result.extractedTitle;
+    }
 
     const newPaper = {
       id: "custom-" + Date.now(),
