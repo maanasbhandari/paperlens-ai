@@ -110,7 +110,7 @@ flowchart TD
 | **Mayank Kumar** | **Clinical NLP & Prompt Engineering** | Google Gemini prompt design, sentence-level citation indexing, and Cochrane risk-of-bias validation rules. |
 | **[Add Member 3 Name]** | **Frontend & Data Visualization** | Monochrome UI/UX design system, Chart.js quantitative endpoint visualizer, and Web Speech audio player. |
 | **[Add Member 4 Name]** | **Clinical Data & Benchmark Validation** | NEJM Phase 3 trial dataset curation, multi-paper contradiction/consensus matrix benchmarking, and QA testing. |
-| **[Add Member 5 Name]** | **Clinical Data & Benchmark Validation** | NEJM Phase 3 trial dataset curation, multi-paper contradiction/consensus matrix benchmarking, and QA testing. |
+| **Siddharth Vijayaraghavan Rajamani** | **Clinical Data & Benchmark Validation** | NEJM Phase 3 trial dataset curation, multi-paper contradiction/consensus matrix benchmarking, and QA testing. |
 ---
 
 ## 🏆 Hackathon Team Presentation Script (3 Minutes)
