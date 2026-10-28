@@ -131,104 +131,98 @@
       </div>
     </header>
 
-    <!-- PAGE 0: Clean Intake & Prompting Workbench -->
-    <div id="page-home" class="page-view flex-1 flex flex-col items-center justify-center p-4 sm:p-8 max-w-4xl mx-auto w-full fade-in">
+    <!-- PAGE 0: Simple Linear Intake & Prompting Workbench -->
+    <div id="page-home" class="page-view flex-1 flex flex-col items-center justify-center p-4 sm:p-8 max-w-2xl mx-auto w-full fade-in">
       
       <div class="text-center mb-6">
-        <div class="w-12 h-12 rounded-xl bg-[#09090b] text-white flex items-center justify-center mx-auto mb-3 shadow">
-          <i data-lucide="sparkles" class="w-6 h-6 text-white"></i>
-        </div>
         <h2 class="text-2xl sm:text-3xl font-extrabold text-[#09090b] tracking-tight">
-          Synthesize medical literature with precision.
+          Synthesize medical research with precision.
         </h2>
         <p class="text-xs sm:text-sm text-[#52525b] mt-1.5 max-w-md mx-auto">
-          Upload a clinical research PDF or paste an abstract below to generate structured evidence, grounded citations, and audio briefings.
+          Upload a clinical paper or paste an abstract below to generate structured evidence, grounded citations, and audio briefings.
         </p>
       </div>
 
-      <!-- Main Intake Card -->
+      <!-- Main Clean Intake Card: File First, Prompt Directly Below -->
       <form id="summary-form" onsubmit="event.preventDefault(); runClinicalSynthesis();" class="mono-card p-6 sm:p-8 w-full bg-white space-y-5">
         
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
-          
-          <!-- Left 6: Upload / Paste -->
-          <div class="md:col-span-6 space-y-2">
-            <div class="flex justify-between items-center">
-              <label class="block text-xs font-bold uppercase tracking-wider text-[#09090b]">
-                1. Upload Research Document
-              </label>
-              <span class="text-[11px] text-[#71717a]">PDF or Text</span>
-            </div>
+        <!-- SECTION 1: Upload File / Abstract -->
+        <div class="space-y-2">
+          <div class="flex justify-between items-center">
+            <label class="block text-xs font-bold uppercase tracking-wider text-[#09090b]">
+              1. Document or Abstract
+            </label>
+            <span class="text-[11px] text-[#71717a]">PDF or Text</span>
+          </div>
 
-            <!-- Upload vs Paste Tabs -->
-            <div class="flex space-x-3 border-b border-[#e4e4e7] pb-1.5 text-xs">
-              <button type="button" id="tabUploadBtn" onclick="switchInputMode('upload')" class="font-bold text-[#09090b] border-b-2 border-[#09090b] pb-1 flex items-center">
-                <i data-lucide="file-up" class="w-3.5 h-3.5 mr-1.5"></i> Upload PDF
-              </button>
-              <button type="button" id="tabPasteBtn" onclick="switchInputMode('paste')" class="font-medium text-[#71717a] hover:text-[#09090b] pb-1 flex items-center">
-                <i data-lucide="clipboard-type" class="w-3.5 h-3.5 mr-1.5"></i> Paste Abstract
-              </button>
-            </div>
+          <!-- Upload vs Paste Tabs -->
+          <div class="flex space-x-4 border-b border-[#e4e4e7] pb-1.5 text-xs">
+            <button type="button" id="tabUploadBtn" onclick="switchInputMode('upload')" class="font-bold text-[#09090b] border-b-2 border-[#09090b] pb-1 flex items-center">
+              <i data-lucide="file-up" class="w-3.5 h-3.5 mr-1.5"></i> Upload PDF File
+            </button>
+            <button type="button" id="tabPasteBtn" onclick="switchInputMode('paste')" class="font-medium text-[#71717a] hover:text-[#09090b] pb-1 flex items-center">
+              <i data-lucide="clipboard-type" class="w-3.5 h-3.5 mr-1.5"></i> Paste Abstract Text
+            </button>
+          </div>
 
-            <!-- Dropzone -->
-            <div id="dropZoneArea" class="border border-dashed border-[#d4d4d8] hover:border-[#09090b] rounded-xl p-6 text-center cursor-pointer transition bg-[#fafafa]">
-              <input type="file" id="fileInput" accept=".pdf,.txt,.md" class="hidden" onchange="handleFileSelected(event)">
-              <div onclick="document.getElementById('fileInput').click()">
-                <div class="w-9 h-9 rounded-lg bg-[#f4f4f5] text-[#09090b] flex items-center justify-center mx-auto mb-2 border border-[#e4e4e7]">
-                  <i data-lucide="file-text" class="w-4 h-4"></i>
-                </div>
-                <p class="text-xs font-bold text-[#09090b]">Drop PDF here, or <span class="underline">browse</span></p>
-                <p class="text-[10px] text-[#71717a] mt-0.5">Parsed client-side • Free & private</p>
+          <!-- Dropzone -->
+          <div id="dropZoneArea" class="border border-dashed border-[#d4d4d8] hover:border-[#09090b] rounded-xl p-6 text-center cursor-pointer transition bg-[#fafafa]">
+            <input type="file" id="fileInput" accept=".pdf,.txt,.md" class="hidden" onchange="handleFileSelected(event)">
+            <div onclick="document.getElementById('fileInput').click()">
+              <div class="w-9 h-9 rounded-lg bg-[#f4f4f5] text-[#09090b] flex items-center justify-center mx-auto mb-2 border border-[#e4e4e7]">
+                <i data-lucide="file-text" class="w-4 h-4"></i>
               </div>
-              <div id="selectedFileInfo" class="hidden mt-2 p-2 bg-[#f4f4f5] border border-[#d4d4d8] rounded-lg text-xs text-[#09090b] flex items-center justify-between">
-                <span id="selectedFileName" class="font-bold truncate max-w-xs"></span>
-                <button type="button" onclick="clearSelectedFile(event)" class="text-[#09090b] hover:text-red-600 ml-2">
-                  <i data-lucide="x" class="w-4 h-4"></i>
-                </button>
-              </div>
+              <p class="text-xs font-bold text-[#09090b]">Drop research PDF here, or <span class="underline">browse</span></p>
+              <p class="text-[10px] text-[#71717a] mt-0.5">Parsed client-side • 100% Free & private</p>
             </div>
-
-            <!-- Paste Area -->
-            <div id="pasteArea" class="hidden">
-              <textarea id="rawPaperText" rows="6" class="w-full text-xs font-mono p-3 border border-[#e4e4e7] rounded-xl focus:ring-2 focus:ring-[#09090b] bg-[#fafafa]" placeholder="Paste medical research abstract or findings here..."></textarea>
+            <div id="selectedFileInfo" class="hidden mt-2 p-2 bg-[#f4f4f5] border border-[#d4d4d8] rounded-lg text-xs text-[#09090b] flex items-center justify-between">
+              <span id="selectedFileName" class="font-bold truncate max-w-xs"></span>
+              <button type="button" onclick="clearSelectedFile(event)" class="text-[#09090b] hover:text-red-600 ml-2">
+                <i data-lucide="x" class="w-4 h-4"></i>
+              </button>
             </div>
           </div>
 
-          <!-- Right 6: Prompt & Suggested Angles -->
-          <div class="md:col-span-6 space-y-2 flex flex-col justify-between">
-            <div>
-              <div class="flex justify-between items-center mb-1">
-                <label for="customAngleInput" class="block text-xs font-bold uppercase tracking-wider text-[#09090b]">
-                  2. Prompt / Clinical Angle <span class="text-[#71717a] lowercase font-normal">(optional)</span>
-                </label>
-                <span class="text-[11px] text-[#71717a]">Custom Lens</span>
-              </div>
-              <textarea id="customAngleInput" rows="3" class="w-full text-xs p-3 border border-[#e4e4e7] rounded-xl focus:ring-2 focus:ring-[#09090b] bg-[#fafafa]" placeholder="e.g. 'Focus on adverse events in elderly', 'Extract hazard ratios & p-values', or leave blank..."></textarea>
-
-              <div class="flex flex-wrap gap-1.5 pt-2 text-[11px]">
-                <span class="text-[#71717a] self-center mr-1">Angles:</span>
-                <button type="button" onclick="setClinicalAngle('Adverse Events & Safety Profile')" class="px-2.5 py-1 rounded-full bg-[#f4f4f5] hover:bg-[#e4e4e7] text-[#09090b] border border-[#e4e4e7] font-medium transition">
-                  Safety & Tolerability
-                </button>
-                <button type="button" onclick="setClinicalAngle('Primary Endpoint Hazard Ratios & P-Values')" class="px-2.5 py-1 rounded-full bg-[#f4f4f5] hover:bg-[#e4e4e7] text-[#09090b] border border-[#e4e4e7] font-medium transition">
-                  Statistical Endpoints
-                </button>
-                <button type="button" onclick="setClinicalAngle('Dosage, Escalation & Pharmacokinetics')" class="px-2.5 py-1 rounded-full bg-[#f4f4f5] hover:bg-[#e4e4e7] text-[#09090b] border border-[#e4e4e7] font-medium transition">
-                  Dosage Schedule
-                </button>
-              </div>
-            </div>
-
-            <!-- Micro summary card -->
-            <div class="p-3 rounded-xl border border-[#e4e4e7] bg-[#fafafa] text-[11px] text-[#52525b] flex items-center justify-between">
-              <span class="flex items-center font-bold text-[#09090b]">
-                <i data-lucide="shield-check" class="w-4 h-4 mr-1.5 text-[#09090b]"></i> Provenance
-              </span>
-              <span>100% sentence-mapped grounding</span>
-            </div>
+          <!-- Paste Area -->
+          <div id="pasteArea" class="hidden">
+            <textarea id="rawPaperText" rows="6" class="w-full text-xs font-mono p-3 border border-[#e4e4e7] rounded-xl focus:ring-2 focus:ring-[#09090b] bg-[#fafafa]" placeholder="Paste clinical trial abstract, study methodology, or raw paper text here..."></textarea>
           </div>
-
         </div>
+
+        <!-- SECTION 2: Clinical Prompt (Directly Below File Section) -->
+        <div class="space-y-2 pt-2 border-t border-[#e4e4e7]">
+          <div class="flex justify-between items-center">
+            <label for="customAngleInput" class="block text-xs font-bold uppercase tracking-wider text-[#09090b]">
+              2. Clinical Prompt / Focus <span class="text-[#71717a] lowercase font-normal">(optional)</span>
+            </label>
+            <span class="text-[11px] text-[#71717a]">Custom Lens</span>
+          </div>
+
+          <div class="relative">
+            <input type="text" id="customAngleInput" class="w-full text-xs p-3.5 pl-9 border border-[#e4e4e7] rounded-xl focus:ring-2 focus:ring-[#09090b] bg-[#fafafa]" placeholder="e.g. 'Focus on adverse events in elderly', 'Extract hazard ratios & p-values', or leave blank...">
+            <i data-lucide="sparkles" class="w-4 h-4 text-[#71717a] absolute left-3 top-3.5"></i>
+          </div>
+
+          <!-- Suggested Angles -->
+          <div class="flex flex-wrap items-center gap-1.5 pt-1 text-[11px]">
+            <span class="text-[#71717a] mr-1">Suggested:</span>
+            <button type="button" onclick="setClinicalAngle('Adverse Events & Safety Profile')" class="px-2.5 py-0.5 rounded-full bg-[#f4f4f5] hover:bg-[#e4e4e7] text-[#09090b] border border-[#e4e4e7] font-medium transition">
+              Safety & Tolerability
+            </button>
+            <button type="button" onclick="setClinicalAngle('Primary Endpoint Hazard Ratios & P-Values')" class="px-2.5 py-0.5 rounded-full bg-[#f4f4f5] hover:bg-[#e4e4e7] text-[#09090b] border border-[#e4e4e7] font-medium transition">
+              Statistical Endpoints
+            </button>
+            <button type="button" onclick="setClinicalAngle('Dosage, Escalation & Pharmacokinetics')" class="px-2.5 py-0.5 rounded-full bg-[#f4f4f5] hover:bg-[#e4e4e7] text-[#09090b] border border-[#e4e4e7] font-medium transition">
+              Dosage Schedule
+            </button>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button id="submit-button" type="submit" class="w-full py-3.5 px-4 btn-primary-mono font-bold text-xs rounded-xl shadow transition flex items-center justify-center space-x-2">
+          <span id="submitBtnText">Synthesize & Analyze Clinical Evidence</span>
+          <span aria-hidden="true">→</span>
+        </button>
 
         <!-- 1-Click Landmark Trials -->
         <div class="pt-3 border-t border-[#e4e4e7] flex flex-wrap items-center justify-between gap-2 text-xs">
@@ -245,12 +239,6 @@
             </button>
           </div>
         </div>
-
-        <!-- Submit Button -->
-        <button id="submit-button" type="submit" class="w-full py-3.5 px-4 btn-primary-mono font-bold text-xs rounded-xl shadow transition flex items-center justify-center space-x-2">
-          <span id="submitBtnText">Synthesize & Analyze Clinical Evidence</span>
-          <span aria-hidden="true">→</span>
-        </button>
 
       </form>
 
