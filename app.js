@@ -543,7 +543,9 @@ function clearInspectorHighlights() {
  * Render Contradiction & Consensus Matrix
  */
 function renderComparisonMatrix() {
-  const matrix = CONSENSUS_CONTRADICTION_MATRIX;
+  const matrix = (appState.currentPaper && appState.currentPaper.matrixData)
+    ? appState.currentPaper.matrixData
+    : CONSENSUS_CONTRADICTION_MATRIX;
 
   const chipsEl = document.getElementById('matrixStudiesChips');
   chipsEl.innerHTML = '';
@@ -810,20 +812,23 @@ async function runClinicalSynthesis() {
       paperTitle = result.extractedTitle;
     }
 
+    const isMulti = result.matrixData && result.matrixData.studiesCompared && result.matrixData.studiesCompared.length >= 2;
+
     const newPaper = {
       id: "custom-" + Date.now(),
-      title: paperTitle,
-      journal: "Ingested Study Document",
+      title: isMulti ? `Multi-Paper Synthesis (${result.matrixData.studiesCompared.length} Trials)` : paperTitle,
+      journal: isMulti ? "Cross-Trial Meta-Synthesis" : "Ingested Study Document",
       year: "2024",
       doi: "N/A",
       pmid: "N/A",
       phase: result.riskOfBias || "Standard Clinical Protocol",
       sampleSize: result.sampleSize || 0,
-      authors: "Clinical Investigators",
+      authors: isMulti ? `Multi-Cohort Clinical Dataset` : "Clinical Investigators",
       abstract: textToAnalyze,
       sentences: result.sentences,
       structuredSummary: result,
-      metricsData: result.metricsData
+      metricsData: result.metricsData,
+      matrixData: result.matrixData || null
     };
 
     appState.currentPaper = newPaper;
