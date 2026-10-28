@@ -102,6 +102,17 @@ flowchart TD
 
 ---
 
+## 👥 Hackathon Team & Division of Responsibilities
+
+| Team Member | Role | Core Responsibilities & Contributions |
+| :--- | :--- | :--- |
+| **Maanas Bhandari** | **Team Lead & Full-Stack Architect** | System architecture, Vercel serverless integration, core engine controller, and intake routing. |
+| **[Add Member 2 Name]** | **Clinical NLP & Prompt Engineering** | Google Gemini prompt design, sentence-level citation indexing, and Cochrane risk-of-bias validation rules. |
+| **[Add Member 3 Name]** | **Frontend & Data Visualization** | Monochrome UI/UX design system, Chart.js quantitative endpoint visualizer, and Web Speech audio player. |
+| **[Add Member 4 Name]** | **Clinical Data & Benchmark Validation** | NEJM Phase 3 trial dataset curation, multi-paper contradiction/consensus matrix benchmarking, and QA testing. |
+
+---
+
 ## 🏆 Hackathon Team Presentation Script (3 Minutes)
 
 - **[0:00 - 0:40] Problem & Hook:** Clinicians and researchers read dozens of 10-page papers every week, suffering from cognitive overload. Existing LLMs hallucinate numbers and lack rigorous medical provenance.
